@@ -27,6 +27,7 @@ void main() {
       expect(r.events.first.description, 'Nel locker: pronto da ritirare');
       expect(r.events.length, 3);
       expect(r.detail, 'Locker MIL123M, Via Roma 1, 20100 Milano');
+      expect(r.place, 'Locker MIL123M');
     });
 
     test('stato sconosciuto resta leggibile', () {
@@ -104,6 +105,7 @@ void main() {
       expect(r.eta, DateTime(2026, 11, 25));
       expect(r.detail, contains('fermopoint'));
       expect(r.detail, contains('in consegna'));
+      expect(r.place, 'BRT-fermopoint');
     });
 
     test('numero DPD non trovato (risposta reale)', () {

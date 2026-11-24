@@ -8,6 +8,7 @@ import '../core/extract.dart';
 import '../core/shops.dart';
 import '../services/store.dart';
 import 'detail_screen.dart';
+import 'place_picker.dart';
 import 'scan_screen.dart';
 
 /// Aggiunta di un pacco. Se arriva testo da un'altra app, numero,
@@ -34,6 +35,7 @@ class _AddScreenState extends State<AddScreen> {
   String _context = '';
   String? _error;
   bool _saving = false;
+  String? _place;
 
   @override
   void initState() {
@@ -122,6 +124,7 @@ class _AddScreenState extends State<AddScreen> {
       name: _name.text,
       shop: _shop.text,
     );
+    if (_place != null) await widget.store.setPlace(s, _place);
     unawaited(widget.store.refresh(s));
     nav.pushReplacement(MaterialPageRoute<void>(
       builder: (_) => DetailScreen(store: widget.store, id: s.id),
@@ -245,6 +248,10 @@ class _AddScreenState extends State<AddScreen> {
                 ActionChip(label: Text(s), onPressed: () => setState(() => _shop.text = s)),
             ],
           ),
+          const SizedBox(height: 20),
+          Text('Dove arriva (facoltativo)', style: theme.textTheme.labelLarge),
+          const SizedBox(height: 6),
+          PlacePicker(store: widget.store, value: _place, onChanged: (v) => setState(() => _place = v)),
           const SizedBox(height: 20),
           TextField(
             controller: _name,

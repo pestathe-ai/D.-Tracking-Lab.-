@@ -3,6 +3,8 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../services/store.dart';
 import '../services/track17.dart';
+import 'place_picker.dart';
+import 'style.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key, required this.store});
@@ -87,6 +89,37 @@ class _SettingsScreenState extends State<SettingsScreen> {
               value: widget.store.checkClipboard,
               onChanged: (v) => widget.store.setCheckClipboard(v),
             ),
+            section('Luoghi di consegna'),
+            if (widget.store.places.isEmpty)
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Text('Nessun luogo ancora. Scegline uno quando aggiungi o modifichi un pacco.',
+                    style: muted),
+              ),
+            for (final p in widget.store.places)
+              ListTile(
+                leading: InkWell(
+                  customBorder: const CircleBorder(),
+                  onTap: () => pickPlaceColor(context, widget.store, p),
+                  child: CircleAvatar(radius: 14, backgroundColor: placeColor(widget.store.placeColorIndex(p))),
+                ),
+                title: Text(p),
+                subtitle: const Text('Tocca il pallino per cambiare colore'),
+                trailing: PopupMenuButton<String>(
+                  onSelected: (v) async {
+                    if (v == 'rename') {
+                      final n = await askPlaceName(context, initial: p, title: 'Rinomina luogo');
+                      if (n != null) await widget.store.renamePlace(p, n);
+                    } else if (v == 'remove') {
+                      await widget.store.removePlace(p);
+                    }
+                  },
+                  itemBuilder: (_) => const [
+                    PopupMenuItem(value: 'rename', child: Text('Rinomina')),
+                    PopupMenuItem(value: 'remove', child: Text('Elimina')),
+                  ],
+                ),
+              ),
             section('Scorciatoie dalle altre app'),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -143,7 +176,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 child: Text(_keyInfo!, style: theme.textTheme.bodyMedium),
               ),
             const SizedBox(height: 32),
-            Center(child: Text('D. Tracking lab · versione 0.4', style: muted)),
+            Center(child: Text('D. Tracking lab · versione 0.5', style: muted)),
             const SizedBox(height: 4),
             Center(child: Text('un\'app Dom Studio', style: theme.textTheme.bodySmall)),
           ],

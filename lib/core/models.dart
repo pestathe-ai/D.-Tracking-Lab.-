@@ -86,6 +86,7 @@ class Shipment {
     this.error,
     this.serviceCarrier,
     this.note,
+    this.place,
   });
 
   final String id;
@@ -109,6 +110,9 @@ class Shipment {
 
   /// Informazione in più dal corriere (es. locker di ritiro).
   String? note;
+
+  /// Dove arriva il pacco (Casa, Ufficio, un locker…): stesso luogo, stesso colore.
+  String? place;
 
   TrackEvent? get latest => events.isEmpty ? null : events.first;
 
@@ -134,6 +138,7 @@ class Shipment {
         'error': error,
         'svc': serviceCarrier,
         'note': note,
+        'place': place,
       };
 
   factory Shipment.fromJson(Map<String, dynamic> j) => Shipment(
@@ -154,5 +159,6 @@ class Shipment {
         error: j['error'] as String?,
         serviceCarrier: j['svc'] as String?,
         note: j['note'] as String?,
+        place: j['place'] as String?,
       );
 }

@@ -30,4 +30,14 @@ void main() {
     expect(formatEta(DateTime(2026, 11, 25), now: now), 'Arriva domani');
     expect(formatEta(DateTime(2026, 11, 26), now: now), 'Arriva gio 26 nov');
   });
+
+  test('stesso negozio, stesso colore', () {
+    expect(shopColor('Zalando'), shopColor(' zalando '));
+    expect(placeColor(0), placeColor(placePalette.length));
+  });
+
+  test('il luogo viene salvato', () {
+    final s = Shipment(id: '2', number: 'X1', carrierId: 'brt', createdAt: DateTime(2026), place: 'Ufficio');
+    expect(Shipment.fromJson(s.toJson()).place, 'Ufficio');
+  });
 }

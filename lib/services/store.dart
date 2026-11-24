@@ -20,6 +20,9 @@ class ShipmentStore extends ChangeNotifier {
   String lastOfferedClipboard = '';
   bool loaded = false;
 
+  /// Colore scelto per ogni luogo di consegna (indice della tavolozza).
+  final Map<String, int> placeColors = {};
+
   List<Shipment> get active => _sorted(_items.where((s) => !s.archived));
   List<Shipment> get archived => _sorted(_items.where((s) => s.archived));
   bool isRefreshing(String id) => _refreshing.contains(id);
@@ -62,6 +65,11 @@ class ShipmentStore extends ChangeNotifier {
     apiKey = p.getString('apiKey') ?? '';
     checkClipboard = p.getBool('checkClipboard') ?? true;
     lastOfferedClipboard = p.getString('lastClip') ?? '';
+    placeColors.clear();
+    try {
+      final pc = jsonDecode(p.getString('placeColors') ?? '{}') as Map;
+      pc.forEach((k, v) => placeColors[k as String] = (v as num).toInt());
+    } catch (_) {}
     final raw = p.getString('shipments');
     _items.clear();
     if (raw != null) {
@@ -215,6 +223,11 @@ class ShipmentStore extends ChangeNotifier {
       if (r.events.isNotEmpty) s.events = r.events;
       s.eta = r.eta ?? (s.status == ShipStatus.delivered ? null : s.eta);
       s.note = r.detail ?? s.note;
+      if (s.place == null && r.place != null) {
+        s.place = r.place;
+        _ensurePlaceColor(r.place!);
+        await _savePlaces();
+      }
       s.error = null;
       return true;
     } on SourceException catch (e) {
@@ -248,6 +261,76 @@ class ShipmentStore extends ChangeNotifier {
     } on Track17Exception {
       return false; // si passa alla lettura della pagina, che è gratuita
     }
+  }
+
+  /// Luoghi usati, dal più frequente, più quelli a cui hai dato un colore.
+  List<String> get places {
+    final count = <String, int>{};
+    for (final s in _items) {
+      if (s.place != null) count[s.place!] = (count[s.place!] ?? 0) + 1;
+    }
+    for (final k in placeColors.keys) {
+      count.putIfAbsent(k, () => 0);
+    }
+    final l = count.keys.toList()..sort((a, b) => count[b]!.compareTo(count[a]!));
+    return l;
+  }
+
+  int placeColorIndex(String place) => placeColors[place] ?? _ensurePlaceColor(place);
+
+  int _ensurePlaceColor(String place) {
+    final existing = placeColors[place];
+    if (existing != null) return existing;
+    // Primo colore della tavolozza non ancora usato.
+    var i = 0;
+    while (placeColors.containsValue(i) && i < 64) {
+      i++;
+    }
+    placeColors[place] = i;
+    return i;
+  }
+
+  Future<void> _savePlaces() async {
+    final p = await SharedPreferences.getInstance();
+    await p.setString('placeColors', jsonEncode(placeColors));
+  }
+
+  Future<void> setPlace(Shipment s, String? place) async {
+    final v = place?.trim();
+    s.place = (v == null || v.isEmpty) ? null : v;
+    if (s.place != null) _ensurePlaceColor(s.place!);
+    await _savePlaces();
+    await update(s);
+  }
+
+  Future<void> setPlaceColor(String place, int index) async {
+    placeColors[place] = index;
+    await _savePlaces();
+    notifyListeners();
+  }
+
+  /// Rinomina un luogo su tutti i pacchi.
+  Future<void> renamePlace(String from, String to) async {
+    final t = to.trim();
+    if (t.isEmpty || t == from) return;
+    for (final s in _items) {
+      if (s.place == from) s.place = t;
+    }
+    final c = placeColors.remove(from);
+    if (c != null) placeColors[t] = c;
+    await _savePlaces();
+    await _save();
+    notifyListeners();
+  }
+
+  Future<void> removePlace(String place) async {
+    for (final s in _items) {
+      if (s.place == place) s.place = null;
+    }
+    placeColors.remove(place);
+    await _savePlaces();
+    await _save();
+    notifyListeners();
   }
 
   @visibleForTesting

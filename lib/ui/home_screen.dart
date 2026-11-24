@@ -8,6 +8,7 @@ import 'add_screen.dart';
 import 'archive_screen.dart';
 import 'settings_screen.dart';
 import 'shipment_tile.dart';
+import 'style.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key, required this.store, required this.onAdd});
@@ -21,6 +22,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   String? _clipNumber;
+  String? _placeFilter;
   String _clipText = '';
 
   ShipmentStore get store => widget.store;
@@ -86,7 +88,11 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     return ListenableBuilder(
       listenable: store,
       builder: (context, _) {
-        final active = store.active;
+        final places = store.places;
+        if (_placeFilter != null && !places.contains(_placeFilter)) _placeFilter = null;
+        final active = store.active
+            .where((s) => _placeFilter == null || s.place == _placeFilter)
+            .toList();
         final attention = active.where((s) => s.status.needsAttention).toList();
         final delivered = active.where((s) => s.status == ShipStatus.delivered).toList();
         final transit = active
@@ -136,7 +142,14 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                     padding: const EdgeInsets.only(top: 4, bottom: 100),
                     children: [
                       if (_clipNumber != null) _clipCard(theme),
-                      if (active.isEmpty) _empty(theme),
+                      if (places.length >= 2) _placeFilterBar(places),
+                      if (active.isEmpty && _placeFilter == null) _empty(theme),
+                      if (active.isEmpty && _placeFilter != null)
+                        Padding(
+                          padding: const EdgeInsets.all(32),
+                          child: Text('Nessun pacco in arrivo a "$_placeFilter".',
+                              textAlign: TextAlign.center, style: theme.textTheme.bodyMedium),
+                        ),
                       if (attention.isNotEmpty) ...[
                         _header(theme, 'Da tenere d\'occhio'),
                         for (final s in attention) ShipmentTile(store: store, shipment: s),
@@ -162,6 +175,30 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       },
     );
   }
+
+  Widget _placeFilterBar(List<String> places) => SizedBox(
+        height: 48,
+        child: ListView(
+          scrollDirection: Axis.horizontal,
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+          children: [
+            ChoiceChip(
+              label: const Text('Tutti'),
+              selected: _placeFilter == null,
+              onSelected: (_) => setState(() => _placeFilter = null),
+            ),
+            for (final p in places) ...[
+              const SizedBox(width: 8),
+              ChoiceChip(
+                avatar: CircleAvatar(backgroundColor: placeColor(store.placeColorIndex(p)), radius: 7),
+                label: Text(p),
+                selected: _placeFilter == p,
+                onSelected: (sel) => setState(() => _placeFilter = sel ? p : null),
+              ),
+            ],
+          ],
+        ),
+      );
 
   Widget _header(ThemeData theme, String text) => Padding(
         padding: const EdgeInsets.fromLTRB(20, 16, 20, 6),

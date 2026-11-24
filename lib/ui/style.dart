@@ -86,3 +86,108 @@ String formatEta(DateTime eta, {DateTime? now}) {
   if (_sameDay(eta, now.add(const Duration(days: 1)))) return 'Arriva domani';
   return 'Arriva ${_weekdays[eta.weekday - 1]} ${eta.day} ${_months[eta.month - 1]}';
 }
+
+/// Colori dei luoghi di consegna (pieni): stesso luogo, stesso colore.
+const placePalette = <Color>[
+  Color(0xFF2EC4B6), // verde acqua
+  Color(0xFFFF8C42), // arancio
+  Color(0xFFE85D9E), // rosa
+  Color(0xFF8BC34A), // verde
+  Color(0xFF4FA3F7), // azzurro
+  Color(0xFFA77BEA), // viola
+  Color(0xFFE5484D), // rosso
+  Color(0xFF9E8F6E), // sabbia
+];
+
+const placePaletteNames = [
+  'Verde acqua', 'Arancio', 'Rosa', 'Verde', 'Azzurro', 'Viola', 'Rosso', 'Sabbia',
+];
+
+Color placeColor(int index) => placePalette[index % placePalette.length];
+
+/// Colori dei negozi (usati come contorno): sempre uguali per lo stesso nome.
+const _shopPalette = <Color>[
+  Color(0xFFFFB020),
+  Color(0xFF3DD6D0),
+  Color(0xFFFF6B8B),
+  Color(0xFF7C9CFF),
+  Color(0xFF6FD66F),
+  Color(0xFFFF8A4C),
+  Color(0xFFC08BFF),
+  Color(0xFF56C2FF),
+  Color(0xFFE9D84A),
+  Color(0xFFFF5F5F),
+];
+
+Color shopColor(String shop) {
+  var h = 0;
+  for (final c in shop.trim().toLowerCase().codeUnits) {
+    h = (h * 31 + c) & 0x7fffffff;
+  }
+  return _shopPalette[h % _shopPalette.length];
+}
+
+/// Etichetta del negozio: contorno colorato, ben visibile.
+class ShopBadge extends StatelessWidget {
+  const ShopBadge(this.shop, {super.key, this.large = false});
+  final String shop;
+  final bool large;
+
+  @override
+  Widget build(BuildContext context) {
+    final color = shopColor(shop);
+    final dark = Theme.of(context).brightness == Brightness.dark;
+    final text = dark ? color : Color.lerp(color, Colors.black, 0.45)!;
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: large ? 12 : 9, vertical: large ? 5 : 2),
+      decoration: BoxDecoration(
+        border: Border.all(color: color, width: large ? 2 : 1.6),
+        borderRadius: BorderRadius.circular(20),
+        color: color.withValues(alpha: 0.10),
+      ),
+      child: Text(
+        shop,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        style: TextStyle(
+          color: text,
+          fontWeight: FontWeight.w700,
+          fontSize: large ? 14 : 12,
+          letterSpacing: 0.2,
+        ),
+      ),
+    );
+  }
+}
+
+/// Etichetta del luogo di consegna: pallino pieno del colore del luogo.
+class PlaceBadge extends StatelessWidget {
+  const PlaceBadge(this.place, this.color, {super.key});
+  final String place;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Container(
+      padding: const EdgeInsets.fromLTRB(7, 2, 9, 2),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.18),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.place_rounded, size: 13, color: color),
+          const SizedBox(width: 3),
+          Flexible(
+            child: Text(place,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: theme.textTheme.labelSmall?.copyWith(fontWeight: FontWeight.w600)),
+          ),
+        ],
+      ),
+    );
+  }
+}

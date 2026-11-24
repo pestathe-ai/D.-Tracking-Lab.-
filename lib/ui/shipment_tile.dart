@@ -23,10 +23,9 @@ class ShipmentTile extends StatelessWidget {
     final latest = s.latest;
     final refreshing = store.isRefreshing(s.id);
 
-    final subtitleParts = <String>[
-      if (s.shop != null) s.shop!,
-      carrier.id == 'other' ? (s.serviceCarrier ?? carrier.name) : carrier.name,
-    ];
+    final carrierName = carrier.id == 'other' ? (s.serviceCarrier ?? carrier.name) : carrier.name;
+    final place = s.place;
+    final pColor = place == null ? null : placeColor(store.placeColorIndex(place));
 
     return Dismissible(
       key: ValueKey(s.id),
@@ -58,8 +57,14 @@ class ShipmentTile extends StatelessWidget {
           onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
             builder: (_) => DetailScreen(store: store, id: s.id),
           )),
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
+          child: Container(
+            // Barra laterale del colore del luogo di consegna.
+            decoration: BoxDecoration(
+              border: Border(
+                left: BorderSide(color: pColor ?? Colors.transparent, width: 6),
+              ),
+            ),
+            padding: const EdgeInsets.fromLTRB(10, 12, 14, 12),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -86,11 +91,17 @@ class ShipmentTile extends StatelessWidget {
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600)),
-                      const SizedBox(height: 2),
-                      Text(subtitleParts.join(' · '),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: theme.textTheme.bodySmall),
+                      const SizedBox(height: 5),
+                      Wrap(
+                        spacing: 6,
+                        runSpacing: 4,
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        children: [
+                          if (s.shop != null) ShopBadge(s.shop!),
+                          if (place != null) PlaceBadge(place, pColor!),
+                          Text(carrierName, style: theme.textTheme.bodySmall),
+                        ],
+                      ),
                       const SizedBox(height: 6),
                       Text(s.status.label,
                           style: theme.textTheme.labelLarge?.copyWith(color: color)),

@@ -5,6 +5,7 @@ import '../core/carriers.dart';
 import '../core/models.dart';
 import '../services/store.dart';
 import 'page_screen.dart';
+import 'place_picker.dart';
 import 'style.dart';
 
 class DetailScreen extends StatelessWidget {
@@ -151,15 +152,27 @@ class _Detail extends StatelessWidget {
               margin: EdgeInsets.zero,
               child: Column(
                 children: [
-                  if (s.note != null)
-                    ListTile(
-                      leading: const Icon(Icons.place_outlined),
-                      title: Text(s.note!),
-                      subtitle: const Text('Dove ritirarlo'),
-                    ),
+                  ListTile(
+                    leading: Icon(Icons.place_rounded,
+                        color: s.place == null ? null : placeColor(store.placeColorIndex(s.place!))),
+                    title: Text(s.place ?? 'Scegli dove arriva'),
+                    subtitle: Text(s.note ?? 'Luogo di consegna'),
+                    trailing: s.place == null
+                        ? null
+                        : IconButton(
+                            tooltip: 'Colore',
+                            icon: CircleAvatar(
+                                radius: 11, backgroundColor: placeColor(store.placeColorIndex(s.place!))),
+                            onPressed: () => pickPlaceColor(context, store, s.place!),
+                          ),
+                    onTap: () => _edit(context),
+                  ),
                   ListTile(
                     leading: const Icon(Icons.storefront_outlined),
-                    title: Text(s.shop ?? 'Negozio non indicato'),
+                    title: Align(
+                      alignment: Alignment.centerLeft,
+                      child: s.shop == null ? const Text('Negozio non indicato') : ShopBadge(s.shop!, large: true),
+                    ),
                     subtitle: const Text('Negozio'),
                     onTap: () => _edit(context),
                   ),
@@ -225,6 +238,7 @@ class _Detail extends StatelessWidget {
     final name = TextEditingController(text: s.name ?? '');
     final shop = TextEditingController(text: s.shop ?? '');
     var carrierId = s.carrierId;
+    String? place = s.place;
     final saved = await showModalBottomSheet<bool>(
       context: context,
       isScrollControlled: true,
@@ -249,7 +263,11 @@ class _Detail extends StatelessWidget {
                 textCapitalization: TextCapitalization.words,
                 decoration: const InputDecoration(labelText: 'Negozio', border: OutlineInputBorder()),
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 14),
+              Text('Dove arriva', style: Theme.of(c).textTheme.labelLarge),
+              const SizedBox(height: 6),
+              PlacePicker(store: store, value: place, onChanged: (v) => setSheet(() => place = v)),
+              const SizedBox(height: 14),
               DropdownButtonFormField<String>(
                 initialValue: carrierId,
                 isExpanded: true,
@@ -271,7 +289,7 @@ class _Detail extends StatelessWidget {
     s.shop = shop.text.trim().isEmpty ? null : shop.text.trim();
     final carrierChanged = carrierId != s.carrierId;
     s.carrierId = carrierId;
-    await store.update(s);
+    await store.setPlace(s, place);
     if (carrierChanged) await store.refresh(s);
   }
 }

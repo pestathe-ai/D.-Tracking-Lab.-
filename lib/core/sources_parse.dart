@@ -15,6 +15,7 @@ class SourceResult {
     this.eta,
     this.notFound = false,
     this.detail,
+    this.place,
   });
 
   final ShipStatus status;
@@ -26,6 +27,9 @@ class SourceResult {
 
   /// Informazione utile in più (es. locker di ritiro).
   final String? detail;
+
+  /// Luogo di consegna riconosciuto (es. "Locker MIL123M", "BRT-fermopoint").
+  final String? place;
 }
 
 // ───────────────────────────── InPost ─────────────────────────────
@@ -106,6 +110,7 @@ SourceResult parseInPost(Map<String, dynamic> json) {
 
   // Dove ritirarlo (locker), se indicato.
   String? detail;
+  String? place;
   final attrs = json['custom_attributes'];
   if (attrs is Map) {
     final machine = attrs['target_machine_detail'];
@@ -117,11 +122,13 @@ SourceResult parseInPost(Map<String, dynamic> json) {
         if (addr is Map && addr['line2'] is String) addr['line2'] as String,
       ];
       if (parts.isNotEmpty) detail = parts.join(', ');
+      if (machine['name'] is String) place = 'Locker ${machine['name']}';
     } else if (attrs['target_machine_id'] is String) {
       detail = 'Locker ${attrs['target_machine_id']}';
+      place = detail;
     }
   }
-  return SourceResult(status: status, events: events, detail: detail);
+  return SourceResult(status: status, events: events, detail: detail, place: place);
 }
 
 // ───────────────────────────── BRT ─────────────────────────────
@@ -257,7 +264,8 @@ SourceResult parseBrtHtml(String html, String number, {DateTime? now}) {
       'Previsto il ${planned.day}/${planned.month}: $what.',
     ].join('\n');
   }
-  return SourceResult(status: status, events: events, eta: planned, detail: detail);
+  return SourceResult(
+      status: status, events: events, eta: planned, detail: detail, place: fermopoint ? 'BRT-fermopoint' : null);
 }
 
 /// Testi BRT abbreviati o in maiuscolo → frasi leggibili.
