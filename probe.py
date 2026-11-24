@@ -1,29 +1,29 @@
-import json, re, urllib.request, urllib.error
+import re, urllib.request, urllib.error
 UA = "Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0 Mobile Safari/537.36"
-def go(url, data=None, ctype=None, accept="text/html,application/json"):
-    h = {"User-Agent": UA, "Accept": accept, "Accept-Language": "it-IT"}
-    if ctype: h["Content-Type"] = ctype
-    r = urllib.request.Request(url, data=data, headers=h)
+def get(u):
     try:
-        with urllib.request.urlopen(r, timeout=25) as resp:
-            return resp.status, resp.headers.get("Content-Type"), resp.read().decode("utf-8", "replace")
+        with urllib.request.urlopen(urllib.request.Request(u, headers={"User-Agent": UA, "Accept": "text/html,*/*"}), timeout=25) as r:
+            return r.status, r.url, r.read().decode("utf-8", "replace")
     except urllib.error.HTTPError as e:
-        return e.code, e.headers.get("Content-Type"), e.read().decode("utf-8", "replace")
+        return e.code, u, ""
     except Exception as e:
-        return -1, None, repr(e)
+        return -1, u, repr(e)
 out = []
-fake = "JF80000000000"
-code, ct, b = go("https://www.poste.it/online/dovequando/DQ-REST/ricercasemplice",
-                 json.dumps({"tipoRichiedente": "WEB", "codiceSpedizione": fake, "periodoRicerca": 1}).encode(), "application/json")
-out.append(f"=== poste with SDA-like fake\nHTTP {code} {ct}\n{b[:600]}")
-code, ct, b = go(f"https://www.sda.it/wps/portal/Servizi_online/dettaglio-spedizione?locale=it&tracing.letteraVettura={fake}")
-out.append(f"=== sda page HTTP {code} {ct} {len(b)}B")
-for m in sorted(set(re.findall(r"""(?i)(?:src|href|action|url)\s*[:=]\s*["']([^"']*(?:trac|ricerc|spediz|json|rest|ajax|service|api)[^"']*)["']""", b))):
-    out.append("ref: " + m)
-for m in re.finditer(r"(?i)(letteraVettura|tracing)", b):
-    s = max(0, m.start()-200); out.append("ctx: " + re.sub(r"\s+", " ", b[s:m.start()+300]))
-    if len(out) > 60: break
-txt = re.sub(r"(?is)<(script|style).*?</\1>", " ", b); txt = re.sub(r"<[^>]+>", " ", txt); txt = re.sub(r"\s+", " ", txt)
-i = txt.lower().find("spedizion")
-out.append("text: " + txt[max(0,i-300):i+1500])
+for u in ["https://www.poste.it/cerca/index.html", "https://www.poste.it/cerca/", "https://www.poste.it/support-layer/www-poste-it/cerca/",
+          "https://www.poste.it/cerca/views/risultati-spedizioni.html"]:
+    c, final, b = get(u)
+    out.append(f"=== {u}\nHTTP {c} FINAL {final} {len(b)}B")
+    for m in sorted(set(re.findall(r"""(?:src|href)=["']([^"']+\.js[^"']*)["']""", b)))[:30]:
+        out.append("js: " + m)
+    for m in re.finditer(r"risultati-spedizioni[^\"'<> ]{0,80}", b):
+        out.append("route: " + m.group(0))
+    for m in re.finditer(r"[#!/]*/?ricerca[^\"'<> ]{0,60}|codiceSpedizione[^\"'<> ]{0,60}|\?[a-zA-Z]+=\{\{[^}]+\}\}", b):
+        out.append("ref: " + m.group(0))
+    # follow js files and search route definitions
+    for js in sorted(set(re.findall(r"""(?:src)=["']([^"']+\.js[^"']*)["']""", b)))[:25]:
+        url = js if js.startswith("http") else ("https://www.poste.it" + js if js.startswith("/") else final.rsplit("/",1)[0] + "/" + js)
+        c2, _, jb = get(url)
+        for m in re.finditer(r".{0,120}risultati-spedizioni.{0,160}", jb):
+            out.append(f"jsroute[{url[-50:]}]: " + m.group(0).replace("\n"," "))
+            if sum(1 for x in out if x.startswith("jsroute")) > 25: break
 open("result.txt", "w").write("\n".join(out)); print("\n".join(out))
