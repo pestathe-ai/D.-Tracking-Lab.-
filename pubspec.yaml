@@ -1,0 +1,35 @@
+name: d_tracking_lab
+description: "D. Tracking lab: tutti i tuoi pacchi in un posto, gratis."
+publish_to: 'none'
+version: 0.1.0+1
+
+environment:
+  sdk: ^3.8.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  http: ^1.6.0
+  shared_preferences: ^2.5.6
+  url_launcher: ^6.3.3
+  webview_flutter: ^4.14.1
+  mobile_scanner: ^7.5.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+  flutter_launcher_icons: ^0.14.4
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/icon/icon.png
+
+flutter_launcher_icons:
+  android: true
+  ios: false
+  image_path: "assets/icon/icon.png"
+  adaptive_icon_background: "#10182B"
+  adaptive_icon_foreground: "assets/icon/foreground.png"
+  min_sdk_android: 23
