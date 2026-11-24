@@ -72,7 +72,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Text(
-                'Gratis e senza account: per BRT, DPD (consegnato da BRT), InPost, Poste e Amazon l\'app chiede '
+                'Gratis e senza account: per BRT, DPD (consegnato da BRT), InPost, Poste, SDA e Amazon l\'app chiede '
                 'lo stato direttamente ai servizi pubblici del corriere e ti mostra qui stato e passaggi. '
                 'Si aggiorna quando apri l\'app (al massimo ogni 30 minuti) o quando tiri giù la lista.\n'
                 'Alcuni corrieri (DHL, UPS, GLS) vietano la lettura automatica del loro sito: '
@@ -143,7 +143,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 child: Text(_keyInfo!, style: theme.textTheme.bodyMedium),
               ),
             const SizedBox(height: 32),
-            Center(child: Text('D. Tracking lab · versione 0.3', style: muted)),
+            Center(child: Text('D. Tracking lab · versione 0.4', style: muted)),
             const SizedBox(height: 4),
             Center(child: Text('un\'app Dom Studio', style: theme.textTheme.bodySmall)),
           ],

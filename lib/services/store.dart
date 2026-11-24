@@ -220,6 +220,9 @@ class ShipmentStore extends ChangeNotifier {
     } on SourceException catch (e) {
       s.error = e.message;
       return false;
+    } on FormatException catch (e) {
+      s.error = '${carrier.name}: ${e.message}. Mandami uno screenshot di questo messaggio.';
+      return false;
     } catch (e) {
       s.error = 'Risposta di ${carrier.name} non riconosciuta. Riprova più tardi.';
       return false;

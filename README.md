@@ -2,9 +2,9 @@
 
 Tutti i tuoi pacchi in un posto, **gratis** e senza account. Un'app Dom Studio.
 
-## Cosa fa (v0.3)
+## Cosa fa (v0.4)
 - **Stato dentro l'app, gratis e senza account**: per **BRT, DPD (consegnato in Italia da
-  BRT), InPost, Poste Italiane e Amazon Logistics** l'app chiede lo stato direttamente ai servizi
+  BRT), InPost, Poste Italiane, SDA (ora gestita da Poste) e Amazon Logistics** l'app chiede lo stato direttamente ai servizi
   pubblici del corriere e mostra stato, passaggi, data prevista e (InPost) il
   locker di ritiro.
 - DHL, UPS e GLS vietano o bloccano la lettura automatica dei loro siti:

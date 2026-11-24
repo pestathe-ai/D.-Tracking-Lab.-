@@ -16,7 +16,7 @@ class CarrierSources {
       '(KHTML, like Gecko) Chrome/130.0 Mobile Safari/537.36';
 
   /// Corrieri letti direttamente dall'app.
-  static const supported = {'brt', 'dpd', 'inpost', 'poste', 'amazon'};
+  static const supported = {'brt', 'dpd', 'inpost', 'poste', 'sda', 'amazon'};
 
   bool supports(String carrierId) => supported.contains(carrierId);
 
@@ -24,7 +24,8 @@ class CarrierSources {
         // In Italia i pacchi DPD li consegna BRT, che li rintraccia col suo modulo.
         'brt' || 'dpd' => _brt(number),
         'inpost' => _inpost(number),
-        'poste' => _poste(number),
+        // I servizi corriere SDA sono passati a Poste: stessa ricerca.
+        'poste' || 'sda' => _poste(number),
         'amazon' => _amazon(number),
         _ => throw UnsupportedError(carrierId),
       };

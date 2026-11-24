@@ -7,6 +7,7 @@ import 'dart:convert';
 import 'models.dart';
 import 'page_parser.dart';
 
+
 class SourceResult {
   const SourceResult({
     required this.status,
@@ -157,7 +158,13 @@ String htmlToText(String html) {
 }
 
 /// Pagina di risultato di vas.brt.it (sped_det_show).
+///
+/// La tabella "Data | Ora | Filiale | Evento" può arrivare con le celle sulla
+/// stessa riga o una per riga: la leggiamo come una sequenza di celle.
+/// BRT mostra anche eventi *previsti* con data futura (es. "IN CONSEGNA" di
+/// domani): diventano la data prevista, non lo stato attuale.
 SourceResult parseBrtHtml(String html, String number, {DateTime? now}) {
+  now ??= DateTime.now();
   final text = htmlToText(html);
   if (RegExp(
           r'TIS0564|TIS0868|Spedizione non trovata|non trovata oppure ancora in elaborazione|'
@@ -166,42 +173,106 @@ SourceResult parseBrtHtml(String html, String number, {DateTime? now}) {
       .hasMatch(text)) {
     return const SourceResult(status: ShipStatus.notFound, notFound: true);
   }
-  // Togliamo menu e piè di pagina del sito: teniamo la parte centrale.
   final lines = text.split('\n');
-  var start = lines.indexWhere((l) => RegExp(r'Ritorno|Dettaglio|spedizione', caseSensitive: false).hasMatch(l) &&
-      lines.indexOf(l) > 5);
-  if (start < 0) start = 0;
   var end = lines.indexWhere((l) => l.startsWith('Area informativa'));
-  if (end < 0 || end <= start) end = lines.length;
-  final core = lines.sublist(start, end).join('\n');
+  if (end < 0) end = lines.length;
 
-  final r = parseTrackingPage(core, number, now: now);
-  final events = r.events.map(_splitCells).toList();
-  var status = r.status;
-  if (events.isNotEmpty) {
-    status = classifyText(events.first.description) ?? status;
+  // Celle dopo l'intestazione "Data … Evento".
+  final cells = <String>[];
+  var inTable = false;
+  for (final line in lines.sublist(0, end)) {
+    for (final raw in line.split('|')) {
+      final c = raw.trim();
+      if (c.isEmpty) continue;
+      if (!inTable) {
+        if (c.toLowerCase() == 'evento') inTable = true;
+        continue;
+      }
+      cells.add(c);
+    }
   }
-  if (status == ShipStatus.pending && events.isNotEmpty) status = ShipStatus.inTransit;
-  return SourceResult(status: status, events: events, eta: r.eta);
+
+  final dateRe = RegExp(r'^(\d{1,2})[\.\/\-](\d{1,2})[\.\/\-](\d{4})$');
+  final timeRe = RegExp(r'^(\d{1,2})[\.:](\d{2})$');
+  final events = <TrackEvent>[];
+  DateTime? planned;
+  String? plannedText;
+  var i = 0;
+  while (i < cells.length) {
+    final d = dateRe.firstMatch(cells[i]);
+    if (d == null) {
+      // Fine della tabella: la prima cella che non è una data dopo le righe lette.
+      if (events.isNotEmpty || planned != null) break;
+      i++;
+      continue;
+    }
+    i++;
+    var h = 0, mi = 0;
+    var hasTime = false;
+    if (i < cells.length) {
+      final t = timeRe.firstMatch(cells[i]);
+      if (t != null) {
+        h = int.parse(t.group(1)!);
+        mi = int.parse(t.group(2)!);
+        hasTime = true;
+        i++;
+      }
+    }
+    final row = <String>[];
+    while (i < cells.length && !dateRe.hasMatch(cells[i]) && row.length < 2) {
+      row.add(cells[i]);
+      i++;
+    }
+    if (row.isEmpty) continue;
+    final place = row.length > 1 ? row.first : null;
+    final what = row.last;
+    final day = DateTime(int.parse(d.group(3)!), int.parse(d.group(2)!), int.parse(d.group(1)!));
+    final today = DateTime(now.year, now.month, now.day);
+    if (day.isAfter(today) && !hasTime) {
+      planned ??= day;
+      plannedText ??= what;
+      continue;
+    }
+    events.add(TrackEvent(
+      time: DateTime(day.year, day.month, day.day, h, mi),
+      description: _brtEvent(what),
+      location: place == null ? null : _nice(place),
+    ));
+  }
+  events.sort((a, b) => (b.time ?? DateTime(0)).compareTo(a.time ?? DateTime(0)));
+
+  final fermopoint = RegExp(r'fermopoint|fermo point', caseSensitive: false).hasMatch(text);
+  var status = events.isEmpty
+      ? ShipStatus.pending
+      : (classifyText(events.first.description) ?? ShipStatus.inTransit);
+  // Se la consegna prevista è oggi e l'ultimo evento la conferma, resta "in consegna".
+  String? detail;
+  if (fermopoint && status != ShipStatus.delivered) {
+    detail = 'Spedito a un BRT-fermopoint: riceverai un avviso quando sarà pronto da ritirare.';
+  }
+  if (planned != null && plannedText != null && status != ShipStatus.delivered) {
+    final what = _brtEvent(plannedText).toLowerCase();
+    detail = [
+      if (detail != null) detail,
+      'Previsto il ${planned.day}/${planned.month}: $what.',
+    ].join('\n');
+  }
+  return SourceResult(status: status, events: events, eta: planned, detail: detail);
 }
 
-/// "MILANO | IN CONSEGNA" → descrizione "In consegna", luogo "Milano".
-TrackEvent _splitCells(TrackEvent e) {
-  final parts = e.description
-      .split('|')
-      .map((p) => p.trim())
-      .where((p) => p.isNotEmpty && !RegExp(r'^\d{1,2}[:\.]\d{2}$').hasMatch(p))
-      .toList();
-  if (parts.length < 2) return TrackEvent(time: e.time, description: _nice(e.description), location: e.location);
-  final descIndex = parts.indexWhere((p) => classifyText(p) != null);
-  final di = descIndex >= 0 ? descIndex : parts.length - 1;
-  final desc = parts[di];
-  final others = [for (var i = 0; i < parts.length; i++) if (i != di) parts[i]];
-  return TrackEvent(
-    time: e.time,
-    description: _nice(desc),
-    location: e.location ?? (others.isEmpty ? null : _nice(others.join(', '))),
-  );
+/// Testi BRT abbreviati o in maiuscolo → frasi leggibili.
+String _brtEvent(String raw) {
+  final t = raw.toUpperCase().trim();
+  const known = {
+    'DATI SPEDIZ. TRASMESSI A BRT': 'Dati della spedizione ricevuti da BRT',
+    'DATI SPEDIZIONE TRASMESSI A BRT': 'Dati della spedizione ricevuti da BRT',
+    'DIROTTATA': 'Spedizione dirottata',
+    'PARTITA': 'Partita dalla filiale',
+    'ARRIVATA IN FILIALE': 'Arrivata in filiale',
+    'IN CONSEGNA': 'In consegna',
+    'CONSEGNATA': 'Consegnata',
+  };
+  return known[t] ?? _nice(raw.trim());
 }
 
 /// "IN CONSEGNA" → "In consegna".
@@ -214,6 +285,7 @@ String _nice(String s) {
 // ───────────────────────────── Poste Italiane ─────────────────────────────
 
 /// Risposta di POST poste.it/online/dovequando/DQ-REST/ricercasemplice
+/// (vale anche per le spedizioni SDA, gestite ora da Poste).
 SourceResult parsePoste(Map<String, dynamic> json) {
   final moves = (json['listaMovimenti'] as List?) ?? const [];
   if (moves.isEmpty) {
@@ -223,18 +295,38 @@ SourceResult parsePoste(Map<String, dynamic> json) {
   final events = <TrackEvent>[];
   for (final m in moves) {
     if (m is! Map) continue;
-    final desc = _firstString(m, ['statoLavorazione', 'descrizione', 'descrizioneEvento', 'evento', 'stato']);
+    var desc = _firstString(m, [
+      'statoLavorazione', 'descrizioneStato', 'descrizione', 'descrizioneEvento',
+      'evento', 'stato', 'fase', 'faseLavorazione', 'esito',
+    ]);
+    // Campo con un nome diverso: prendiamo il testo descrittivo più lungo.
+    desc ??= (m.entries
+            .where((e) => e.value is String && RegExp(r'[A-Za-z]{4,}').hasMatch(e.value as String))
+            .where((e) => !RegExp(r'luogo|ufficio|local|citt|cap|prov|id|codice', caseSensitive: false)
+                .hasMatch(e.key.toString()))
+            .map((e) => (e.value as String).trim())
+            .toList()
+          ..sort((a, b) => b.length.compareTo(a.length)))
+        .firstOrNull;
     if (desc == null) continue;
+    Object? when = m['dataOra'] ?? m['data'] ?? m['dataEvento'] ?? m['dataOraEvento'] ?? m['timestamp'];
+    when ??= m.entries
+        .where((e) => RegExp(r'data|ora|time', caseSensitive: false).hasMatch(e.key.toString()))
+        .map((e) => e.value)
+        .firstOrNull;
     events.add(TrackEvent(
-      time: _anyDate(m['dataOra'] ?? m['data'] ?? m['dataEvento']),
+      time: _anyDate(when),
       description: _nice(desc),
-      location: _firstString(m, ['luogo', 'ufficio', 'localita', 'frazionario']),
+      location: _firstString(m, ['luogo', 'ufficio', 'localita', 'citta', 'frazionario']),
     ));
   }
   events.sort((a, b) => (b.time ?? DateTime(0)).compareTo(a.time ?? DateTime(0)));
-  final status = events.isEmpty
-      ? ShipStatus.pending
-      : (classifyText(events.first.description) ?? ShipStatus.inTransit);
+  if (events.isEmpty) {
+    // Formato inatteso: lo segnaliamo con i nomi dei campi, per poterlo sistemare.
+    final keys = moves.first is Map ? (moves.first as Map).keys.join(', ') : moves.first.runtimeType;
+    throw FormatException('Formato Poste non riconosciuto (campi: $keys)');
+  }
+  final status = classifyText(events.first.description) ?? ShipStatus.inTransit;
   return SourceResult(status: status, events: events);
 }
 
@@ -334,7 +426,14 @@ DateTime? _anyDate(Object? v) {
   if (v is String) {
     final asInt = int.tryParse(v);
     if (asInt != null) return _anyDate(asInt);
-    return DateTime.tryParse(v)?.toLocal();
+    final iso = DateTime.tryParse(v);
+    if (iso != null) return iso.toLocal();
+    final m = RegExp(r'(\d{1,2})[\/\.\-](\d{1,2})[\/\.\-](\d{4})(?:\D+(\d{1,2})[:\.](\d{2}))?').firstMatch(v);
+    if (m != null) {
+      return DateTime(int.parse(m.group(3)!), int.parse(m.group(2)!), int.parse(m.group(1)!),
+          int.tryParse(m.group(4) ?? '') ?? 0, int.tryParse(m.group(5) ?? '') ?? 0);
+    }
+    return null;
   }
   return null;
 }

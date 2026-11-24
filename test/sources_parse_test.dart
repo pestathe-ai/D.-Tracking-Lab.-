@@ -75,7 +75,35 @@ void main() {
       expect(r.events.first.location, 'Milano');
       expect(r.events.first.time, DateTime(2026, 11, 24, 8, 45));
       expect(r.events.length, 3);
+    });
+
+    test('pagina reale DPD/BRT: celle una per riga, consegna prevista domani, fermopoint', () {
+      const html = '''
+<div>Rintraccia</div><div>Ritiri</div><div>Ritorno</div>
+<table>
+<tr><td>BRTcode</td><td>08400000000000</td></tr>
+<tr><td>Mittente</td><td>KLEINMACHNOW</td></tr>
+<tr><td>Spedizione diretta a BRT-FERMOPOINT</td><td>Ti informeremo non appena il tuo ordine sar&agrave; disponibile per il ritiro.</td></tr>
+</table>
+<table>
+<tr><th><div>Data</div></th><th><div>Ora</div></th><th><div>Filiale</div></th><th><div>Evento</div></th></tr>
+<tr><td><div>25.11.2026</div></td><td><div></div></td><td><div>OOH MILANO (550)</div></td><td><div>IN CONSEGNA</div></td></tr>
+<tr><td><div>24.11.2026</div></td><td><div>10.29</div></td><td><div>OOH MILANO (550)</div></td><td><div>ARRIVATA IN FILIALE</div></td></tr>
+<tr><td><div>23.11.2026</div></td><td><div>21.00</div></td><td><div>MILANO BOVISA 3 (185)</div></td><td><div>PARTITA</div></td></tr>
+<tr><td><div>23.11.2026</div></td><td><div>18.00</div></td><td><div>MILANO BOVISA 3 (185)</div></td><td><div>DIROTTATA</div></td></tr>
+<tr><td><div>23.11.2026</div></td><td><div>08.43</div></td><td><div>MILANO BOVISA 3 (185)</div></td><td><div>DATI SPEDIZ. TRASMESSI A BRT</div></td></tr>
+</table>
+<div>Area informativa</div>''';
+      final r = parseBrtHtml(html, '08400000000000', now: DateTime(2026, 11, 24, 12, 38));
+      expect(r.status, ShipStatus.inTransit);
+      expect(r.events.length, 4);
+      expect(r.events.first.description, 'Arrivata in filiale');
+      expect(r.events.first.location, 'Ooh milano (550)');
+      expect(r.events.first.time, DateTime(2026, 11, 24, 10, 29));
+      expect(r.events.last.description, 'Dati della spedizione ricevuti da BRT');
       expect(r.eta, DateTime(2026, 11, 25));
+      expect(r.detail, contains('fermopoint'));
+      expect(r.detail, contains('in consegna'));
     });
 
     test('numero DPD non trovato (risposta reale)', () {
@@ -95,6 +123,18 @@ void main() {
               '{"idTracciatura":"CC123456789IT","tipoSpedizione":"P","esitoRicerca":"2","azioni":"","listaMovimenti":[],"actionsMap":{},"statoDaVerificare":false}')
           as Map<String, dynamic>);
       expect(r.notFound, isTrue);
+    });
+
+    test('campi con nomi diversi e date in testo', () {
+      final r = parsePoste({
+        'esitoRicerca': '1',
+        'listaMovimenti': [
+          {'dataOraEvento': '24/11/2026 08:10', 'descrizioneFase': 'In consegna', 'luogo': 'Milano'},
+        ],
+      });
+      expect(r.events.single.description, 'In consegna');
+      expect(r.events.single.time, DateTime(2026, 11, 24, 8, 10));
+      expect(r.status, ShipStatus.outForDelivery);
     });
 
     test('movimenti', () {
