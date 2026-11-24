@@ -2,28 +2,20 @@ import re, urllib.request, urllib.error
 UA = "Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0 Mobile Safari/537.36"
 def get(u):
     try:
-        with urllib.request.urlopen(urllib.request.Request(u, headers={"User-Agent": UA, "Accept": "text/html,*/*"}), timeout=25) as r:
-            return r.status, r.url, r.read().decode("utf-8", "replace")
-    except urllib.error.HTTPError as e:
-        return e.code, u, ""
+        with urllib.request.urlopen(urllib.request.Request(u, headers={"User-Agent": UA}), timeout=25) as r:
+            return r.status, r.read().decode("utf-8", "replace")
     except Exception as e:
-        return -1, u, repr(e)
+        return -1, repr(e)
 out = []
-for u in ["https://www.poste.it/cerca/index.html", "https://www.poste.it/cerca/", "https://www.poste.it/support-layer/www-poste-it/cerca/",
-          "https://www.poste.it/cerca/views/risultati-spedizioni.html"]:
-    c, final, b = get(u)
-    out.append(f"=== {u}\nHTTP {c} FINAL {final} {len(b)}B")
-    for m in sorted(set(re.findall(r"""(?:src|href)=["']([^"']+\.js[^"']*)["']""", b)))[:30]:
-        out.append("js: " + m)
-    for m in re.finditer(r"risultati-spedizioni[^\"'<> ]{0,80}", b):
-        out.append("route: " + m.group(0))
-    for m in re.finditer(r"[#!/]*/?ricerca[^\"'<> ]{0,60}|codiceSpedizione[^\"'<> ]{0,60}|\?[a-zA-Z]+=\{\{[^}]+\}\}", b):
-        out.append("ref: " + m.group(0))
-    # follow js files and search route definitions
-    for js in sorted(set(re.findall(r"""(?:src)=["']([^"']+\.js[^"']*)["']""", b)))[:25]:
-        url = js if js.startswith("http") else ("https://www.poste.it" + js if js.startswith("/") else final.rsplit("/",1)[0] + "/" + js)
-        c2, _, jb = get(url)
-        for m in re.finditer(r".{0,120}risultati-spedizioni.{0,160}", jb):
-            out.append(f"jsroute[{url[-50:]}]: " + m.group(0).replace("\n"," "))
-            if sum(1 for x in out if x.startswith("jsroute")) > 25: break
+c, b = get("https://www.poste.it/cerca/index.html")
+srcs = re.findall(r"""<script[^>]+src=["']([^"']+)["']""", b)
+local = [s for s in srcs if "app-resources" not in s and "assets-da" not in s and "risorse_dt" not in s and "google" not in s]
+out.append("local scripts: " + ", ".join(local))
+for s in local:
+    url = s if s.startswith("http") else ("https://www.poste.it" + s if s.startswith("/") else "https://www.poste.it/cerca/" + s)
+    c2, jb = get(url)
+    for m in re.finditer(r".{0,100}(\$stateProvider|\.state\(|url\s*:\s*['\"]/|\$location\.(path|url|search)|\$stateParams\.\w+).{0,140}", jb):
+        out.append(f"[{s}] " + m.group(0).replace("\n", " "))
+for m in re.finditer(r".{0,80}(ui-view|ng-app|ng-controller).{0,80}", b):
+    out.append("html: " + m.group(0).replace("\n"," "))
 open("result.txt", "w").write("\n".join(out)); print("\n".join(out))
