@@ -1,128 +1,6 @@
-local scripts: https://www.poste.it/assets-wcs/oneweb-page-loader.js, https://www.poste.it/assets-wcs/oneweb-bootstrap-datepicker.js, https://www.poste.it/assets-wcs/js.cookie.js, https://www.poste.it/assets-wcs/image-loader.js, https://www.poste.it/cerca-app/js/cerca-spedizioni-redirect.js, https://www.poste.it/cerca-app/js/geolocation.js, https://www.poste.it/cerca-app/js/persistent-placeholder.js, https://www.poste.it/cerca-app/js/jspdf.min.js, https://www.poste.it/cerca-app/js/jspdf.plugin.autotable.js, https://www.poste.it/cerca-app/js/pdfjs.js, https://www.poste.it/cerca-app/js/angular-cookies.min.js, https://www.poste.it/cerca-app/js/app/app.js, https://www.poste.it/cerca-app/js/module/wcs-service.js, https://www.poste.it/cerca-app/js/app/route-config.js, https://www.poste.it/cerca-app/js/app/app-run.js, https://www.poste.it/cerca-app/js/app/libs.js, https://www.poste.it/cerca-app/js/app/services.js, https://www.poste.it/cerca-app/js/app/contatoriricerchespedizioni-service.js, https://www.poste.it/cerca-app/js/app/cerca-nel-sito-results-mapping.js, https://www.poste.it/cerca-app/js/app/webtrends_service.js, https://www.poste.it/cerca-app/js/module/pdfdettaglioup-service.js, https://www.poste.it/cerca-app/js/module/risultati-spedizioni-controller.js, https://www.poste.it/cerca-app/js/module/cerca-controller.js, https://www.poste.it/cerca-app/js/module/forms-ricerche-directive.js, https://www.poste.it/cerca-app/js/module/custom-filters-directive.js, https://www.poste.it/cerca-app/js/module/risultati-cerca-nel-sito-controller.js, https://www.poste.it/cerca-app/js/module/tabs-risultati-ricerche-directive.js, https://www.poste.it/cerca-app/js/module/risultati-text-cns-directive.js, https://www.poste.it/cerca-app/js/module/risultati-files-cns-directive.js, https://www.poste.it/cerca-app/js/module/risultati-boxes-cns-directive.js, https://www.poste.it/cerca-app/js/module/footer01-directive.js, https://www.poste.it/cerca-app/js/module/risultati-cerca-up-base-controller.js, https://www.poste.it/cerca-app/js/module/risultati-cerca-up-controller.js, https://www.poste.it/cerca-app/js/module/risultati-cerca-cassette-controller.js, https://www.poste.it/cerca-app/js/module/vieni-in-poste-controller.js, https://www.poste.it/cerca-app/js/module/cerca-frazionario-controller.js, https://www.poste.it/cerca-app/js/module/start-cerca-controller.js, https://www.poste.it/cerca-app/js/module/risultati-cerca-cap-controller.js, https://www.poste.it/cerca-app/js/module/risultati-text-cns-altrisiti-directive.js, https://www.poste.it/cerca/funzioni-ui-kit.js, https://www.poste.it/cerca-app/js/module/svincola-start-controller.js, https://www.poste.it/cerca-app/js/module/dynamic-svincola-start-directive.js, https://www.poste.it/cerca-app/js/module/svincolo-tables-header-directive.js, https://www.poste.it/cerca-app/js/module/svincola-options-controller.js, https://www.poste.it/cerca-app/js/module/svincolo-controller.js, https://www.poste.it/cerca-app/module/cerca-modal.js, https://www.poste.it/cerca-app/js/module/second-part-form-directive.js, https://www.poste.it/cerca-app/js/module/svincolo-page-type1-directive.js, https://www.poste.it/cerca-app/js/module/svincolo-page-type2-directive.js, https://www.poste.it/cerca-app/js/module/location-address-controller.js, https://www.poste.it/cerca-app/js/module/destinatario-directive.js, https://www.poste.it/cerca-app/js/module/kipoint-directive.js, https://www.poste.it/cerca-app/js/module/svincolo-page-type3-directive.js, https://www.poste.it/cerca-app/js/module/fine-controller.js, https://www.poste.it/cerca-app/js/app/error.constants.js, https://www.poste.it/cerca-app/js/module/orario-modal.js, https://www.poste.it/cerca-app/js/module/box-message-custom.js, https://www.poste.it/widgets/one-web-common/header-applicativo-completo.bundle.js, https://www.poste.it/assets-wcs/sjcl.js, https://www.poste.it/assets-wcs/bloodhoud.min.js, https://www.poste.it/assets-wcs/check-login.js, https://www.poste.it/assets-wcs/staticRecommendation.js, https://www.poste.it/assets-wcs/jquery.inview.min.js, https://www.poste.it/assets-wcs/webtrends.pageload.js
-[https://www.poste.it/cerca-app/js/app/app.js] 		  v2_sp_url: '/posteit-retail-auth-service/sp-rest/idp-retail',
-[https://www.poste.it/cerca-app/js/app/app.js] 		  retail_base_url : '/posteit-retail-service/rest',
-[https://www.poste.it/cerca-app/js/app/route-config.js] app.config(function($stateProvider, $urlRouterProvider) {
-[https://www.poste.it/cerca-app/js/app/route-config.js] 		  $stateProvider
-[https://www.poste.it/cerca-app/js/app/route-config.js] 			.state('/', {
-[https://www.poste.it/cerca-app/js/app/route-config.js] 				  url: "/",
-[https://www.poste.it/cerca-app/js/app/route-config.js] 			.state('/risultati-spedizioni', {
-[https://www.poste.it/cerca-app/js/app/route-config.js] 				  url: "/risultati-spedizioni/:codici",
-[https://www.poste.it/cerca-app/js/app/route-config.js] 			.state('/risultati-spedizioni/survey', {
-[https://www.poste.it/cerca-app/js/app/route-config.js] 				  url: "/risultati-spedizioni/:codici/:survey",
-[https://www.poste.it/cerca-app/js/app/route-config.js] 			.state('/risultati-spedizioni/survey/transazione', {
-[https://www.poste.it/cerca-app/js/app/route-config.js] 				  url: "/risultati-spedizioni/:codici/:survey/:id_transazione",
-[https://www.poste.it/cerca-app/js/app/route-config.js] 			.state('/risultati-spedizioni/richiesta_notifica', {
-[https://www.poste.it/cerca-app/js/app/route-config.js] 				  url: "/risultati-spedizioni/richiesta-notifica/:codici/:numeroTelefono/:email/:periodo/:flagBacheca",
-[https://www.poste.it/cerca-app/js/app/route-config.js] 			.state('/risultati-cerca-nel-sito', {
-[https://www.poste.it/cerca-app/js/app/route-config.js] 				  url: "/risultati-cerca-nel-sito/:terms?fs",
-[https://www.poste.it/cerca-app/js/app/route-config.js] 			.state('/risultati-cerca-up', {
-[https://www.poste.it/cerca-app/js/app/route-config.js] 				  url: "/risultati-cerca-up/:terms?fs",
-[https://www.poste.it/cerca-app/js/app/route-config.js] 			.state('/risultati-cerca-up-frazionario', {
-[https://www.poste.it/cerca-app/js/app/route-config.js] 				  url: "/risultati-cerca-up/:terms/:frazionario",
-[https://www.poste.it/cerca-app/js/app/route-config.js] 			.state('/risultati-cerca-cassette', {
-[https://www.poste.it/cerca-app/js/app/route-config.js] 				  url: "/risultati-cerca-cassette/:terms",
-[https://www.poste.it/cerca-app/js/app/route-config.js] 			.state('/cerca-frazionario', {
-[https://www.poste.it/cerca-app/js/app/route-config.js] 				  url: "/cerca-frazionario/:frazionario?fs",
-[https://www.poste.it/cerca-app/js/app/route-config.js] 			.state('/risultati-cerca-cap', {
-[https://www.poste.it/cerca-app/js/app/route-config.js] 				  url: "/risultati-cerca-cap/:terms",
-[https://www.poste.it/cerca-app/js/app/route-config.js] 			.state('/vieni-in-poste-home', {
-[https://www.poste.it/cerca-app/js/app/route-config.js] 				  url: "/vieni-in-poste?fs&services",
-[https://www.poste.it/cerca-app/js/app/route-config.js] 			.state('/vieni-in-poste', {
-[https://www.poste.it/cerca-app/js/app/route-config.js] 				  url: "/vieni-in-poste/:terms?fs&services&hideServiceFilter",
-[https://www.poste.it/cerca-app/js/app/route-config.js] 			.state('/cerca', {
-[https://www.poste.it/cerca-app/js/app/route-config.js] 				  url: "/cerca/:terms",
-[https://www.poste.it/cerca-app/js/app/route-config.js] 			}).state('/svincola', {
-[https://www.poste.it/cerca-app/js/app/route-config.js] 				url: "/svincola/:codice",
-[https://www.poste.it/cerca-app/js/app/route-config.js] 			}).state('/opzioni-di-svincolo', {
-[https://www.poste.it/cerca-app/js/app/route-config.js] 				url: "/opzioni-di-svincolo",
-[https://www.poste.it/cerca-app/js/app/route-config.js] 			}).state('/svincolo', {
-[https://www.poste.it/cerca-app/js/app/route-config.js] 				url: "/svincolo",
-[https://www.poste.it/cerca-app/js/app/route-config.js] 			}).state('/fine', {
-[https://www.poste.it/cerca-app/js/app/route-config.js] 				url: "/fine",
-[https://www.poste.it/cerca-app/js/app/app-run.js] 		  libs.comportamentaleQuerySender($stateParams.terms);
-[https://www.poste.it/cerca-app/js/app/libs.js] 			  Keyword:libs.modrTerms($stateParams.terms),
-[https://www.poste.it/cerca-app/js/module/risultati-spedizioni-controller.js]         periodo: (parseInt($stateParams.periodo) || SpedizioniStorageService.periodo)
-[https://www.poste.it/cerca-app/js/module/risultati-spedizioni-controller.js]     // if(!$stateParams.codici) {
-[https://www.poste.it/cerca-app/js/module/risultati-spedizioni-controller.js]     $scope.codiciSpedizione = ($stateParams.codici || "").toUpperCase().split(',');
-[https://www.poste.it/cerca-app/js/module/risultati-spedizioni-controller.js]                 if ($stateParams.survey) {
-[https://www.poste.it/cerca-app/js/module/risultati-spedizioni-controller.js]                     if (!$stateParams.survey.match(/^[0-9]{3,10}$/)) {
-[https://www.poste.it/cerca-app/js/module/risultati-spedizioni-controller.js]                         if ($stateParams.survey.startsWith('ZN')) {
-[https://www.poste.it/cerca-app/js/module/risultati-spedizioni-controller.js]                                 "var surveyId='" + $stateParams.survey + "';" +
-[https://www.poste.it/cerca-app/js/module/risultati-spedizioni-controller.js]                             if ($stateParams.id_transazione) {
-[https://www.poste.it/cerca-app/js/module/risultati-spedizioni-controller.js]        var scriptQualtricsVars = scriptQualtricsVars + " var ID_TRANSAZIONE='" + encodeURIComponent($stateParams.id_transazione) + "'; ";
-[https://www.poste.it/cerca-app/js/module/risultati-spedizioni-controller.js]                             divQualtrics.id = $stateParams.survey;
-[https://www.poste.it/cerca-app/js/module/risultati-spedizioni-controller.js]                             var splitSurveiId = $stateParams.survey.split('_')[0].toLowerCase() + $stateParams.survey.split('_')[1].toLowerCase();
-[https://www.poste.it/cerca-app/js/module/risultati-spedizioni-controller.js]  try{(new g("https://` + splitSurveiId + `-posteitaliane.siteintercept.qualtrics.com/SIE/?Q_ZID=` + $stateParams.survey + `")).start()}catch{}})();`;
-[https://www.poste.it/cerca-app/js/module/risultati-spedizioni-controller.js]                   $scope.surveyCercaSped = config.customSurveyCercaSped.replace('{{codicesurvey}}', $stateParams.survey).replace('{{codicesped}}', r.idTracciatura);
-[https://www.poste.it/cerca-app/js/module/risultati-spedizioni-controller.js]                             if ($stateParams.id_transazione) {
-[https://www.poste.it/cerca-app/js/module/risultati-spedizioni-controller.js]    $scope.surveyCercaSped = $scope.surveyCercaSped.replace('{{id_transazione}}', encodeURIComponent($stateParams.id_transazione));
-[https://www.poste.it/cerca-app/js/module/risultati-spedizioni-controller.js]           script.src = "https://aiutaciamigliorare.poste.it/digi_runner.js?language=it&surveyId=" + $stateParams.survey + '&customerId=' + r.idTracciatura + '&codicespedizione=' + r.idTracciatura;
-[https://www.poste.it/cerca-app/js/module/risultati-spedizioni-controller.js]                         if ($stateParams.id_transazione) {
-[https://www.poste.it/cerca-app/js/module/risultati-spedizioni-controller.js]                             script.src = script.src + '&ID_TRANSAZIONE=' + $stateParams.id_transazione;
-[https://www.poste.it/cerca-app/js/module/risultati-spedizioni-controller.js]           script.src = "https://aiutaciamigliorare.poste.it/digi_runner.js?language=it&surveyId=" + $stateParams.survey + '&customerId=' + r.idTracciatura + '&codicespedizione=' + r.idTracciatura;
-[https://www.poste.it/cerca-app/js/module/risultati-spedizioni-controller.js]                     if ($stateParams.id_transazione) {
-[https://www.poste.it/cerca-app/js/module/risultati-spedizioni-controller.js]                         script.src = script.src + '&ID_TRANSAZIONE=' + $stateParams.id_transazione;
-[https://www.poste.it/cerca-app/js/module/risultati-spedizioni-controller.js]                 codici: $stateParams.codici,
-[https://www.poste.it/cerca-app/js/module/risultati-spedizioni-controller.js]             $stateParams.codici,
-[https://www.poste.it/cerca-app/js/module/risultati-spedizioni-controller.js]             $stateParams.numeroTelefono,
-[https://www.poste.it/cerca-app/js/module/risultati-spedizioni-controller.js]             $stateParams.email,
-[https://www.poste.it/cerca-app/js/module/risultati-spedizioni-controller.js]             $stateParams.periodo,
-[https://www.poste.it/cerca-app/js/module/risultati-spedizioni-controller.js]             ($stateParams.flagBacheca === 'true')
-[https://www.poste.it/cerca-app/js/module/forms-ricerche-directive.js] 		$scope.cercaSpedizioniArray=($stateParams.codici)?$stateParams.codici.split(','):[];
-[https://www.poste.it/cerca-app/js/module/forms-ricerche-directive.js] 		$scope.campoCercaProdottiServizi=$stateParams.terms;
-[https://www.poste.it/cerca-app/js/module/forms-ricerche-directive.js]     $scope.inputVal = $state.current.name.startsWith('/risultati-spedizioni') && $stateParams.codici ? $stateParams.codici: '';
-[https://www.poste.it/cerca-app/js/module/forms-ricerche-directive.js]     $scope.showAbstract = $state.current.name.startsWith('/risultati-spedizioni') && !$stateParams.codici ? true : false;
-[https://www.poste.it/cerca-app/js/module/forms-ricerche-directive.js] 				$campoTestotag.val($stateParams.codici).tagsinput({
-[https://www.poste.it/cerca-app/js/module/risultati-cerca-nel-sito-controller.js]       if(!$stateParams.terms) {
-[https://www.poste.it/cerca-app/js/module/risultati-cerca-nel-sito-controller.js]   $scope.terms=$stateParams.terms;
-[https://www.poste.it/cerca-app/js/module/risultati-cerca-nel-sito-controller.js]         Keyword:$stateParams.terms,
-[https://www.poste.it/cerca-app/js/module/risultati-cerca-nel-sito-controller.js]   		Keyword: $stateParams.terms
-[https://www.poste.it/cerca-app/js/module/risultati-cerca-nel-sito-controller.js] 			Keyword:libs.modrTerms($stateParams.terms)
-[https://www.poste.it/cerca-app/js/module/risultati-cerca-nel-sito-controller.js]       webTrendsService.cercaProdottiServizi.search_done($stateParams.terms, $scope.countResults);
-[https://www.poste.it/cerca-app/js/module/risultati-cerca-nel-sito-controller.js] 	// 		Keyword:libs.modrTerms($stateParams.terms),
-[https://www.poste.it/cerca-app/js/module/risultati-cerca-up-base-controller.js] 	$scope.campoCercaProdottiServizi=$scope.terms=$stateParams.terms;
-[https://www.poste.it/cerca-app/js/module/risultati-cerca-up-base-controller.js]     $scope.paramposition=$stateParams.position;
-[https://www.poste.it/cerca-app/js/module/risultati-cerca-up-base-controller.js] 		var tipologiaParam = $location.search().tipologia;
-[https://www.poste.it/cerca-app/js/module/risultati-cerca-up-base-controller.js] 		if ($location.search().tipologia) {
-[https://www.poste.it/cerca-app/js/module/risultati-cerca-up-base-controller.js] 		var serviceId = $location.search().services;
-[https://www.poste.it/cerca-app/js/module/risultati-cerca-up-base-controller.js] 					if($location.search().fromConsulente && $location.search().fromConsulente.trim() !== '' && $location.search().fromConsulente.toLowerCase() === 'true') {
-[https://www.poste.it/cerca-app/js/module/risultati-cerca-up-base-controller.js]     $scope.preSelectedFrazionario=$stateParams.frazionario; // frazionario di cui aprire il dettaglio in automatico - TODO
-[https://www.poste.it/cerca-app/js/module/risultati-cerca-up-controller.js]       if(!$stateParams.terms) {
-[https://www.poste.it/cerca-app/js/module/risultati-cerca-up-controller.js]         webTrendsService.cercaProdottiServizi.search_done($stateParams.terms, $scope.items.length);
-[https://www.poste.it/cerca-app/js/module/risultati-cerca-cassette-controller.js] 	$scope.campoCercaProdottiServizi=$scope.terms=$stateParams.terms;
-[https://www.poste.it/cerca-app/js/module/risultati-cerca-cassette-controller.js]     $scope.paramposition=$stateParams.position;
-[https://www.poste.it/cerca-app/js/module/cerca-frazionario-controller.js] 		$scope.campoCercaFrazionario = $stateParams.frazionario;
-[https://www.poste.it/cerca-app/js/module/cerca-frazionario-controller.js] 		if($stateParams.frazionario){
-[https://www.poste.it/cerca-app/js/module/cerca-frazionario-controller.js] 			$scope.mapCollectionService.getPointDetail($stateParams.frazionario,'UfficioPostale').then(function(result){
-[https://www.poste.it/cerca-app/js/module/cerca-frazionario-controller.js] 					$scope.mapCollectionService.getPointDetail($stateParams.frazionario,'PuntoPoste').then(function(result2){
-[https://www.poste.it/cerca-app/js/module/cerca-frazionario-controller.js] 							$scope.mapCollectionService.getPointDetail($stateParams.frazionario,'SpazioFilatelico').then(function(result3){
-[https://www.poste.it/cerca-app/js/module/cerca-frazionario-controller.js] 									$scope.terms = $stateParams.frazionario;
-[https://www.poste.it/cerca-app/js/module/start-cerca-controller.js] 	searchRedirect.cercaStart($stateParams.terms);
-[https://www.poste.it/cerca-app/js/module/risultati-cerca-cap-controller.js] //  if(!$stateParams.terms) {
-[https://www.poste.it/cerca-app/js/module/risultati-cerca-cap-controller.js] 	$scope.terms=$stateParams.terms;
-[https://www.poste.it/cerca-app/js/module/risultati-cerca-cap-controller.js] 		webTrendsService.cercaProdottiServizi.search_done($stateParams.terms, $scope.itemsLength);
-[https://www.poste.it/cerca-app/js/module/risultati-text-cns-altrisiti-directive.js]                 Keyword:$stateParams.terms,
-[https://www.poste.it/cerca-app/js/module/svincola-start-controller.js]     $stateParams.hasOtp = typeof $stateParams.hasOtp === 'string' ? JSON.parse($stateParams.hasOtp) : $stateParams.hasOtp;
-[https://www.poste.it/cerca-app/js/module/svincola-start-controller.js]     $scope.hasOtp = $stateParams.hasOtp;
-[https://www.poste.it/cerca-app/js/module/svincola-start-controller.js]     $scope.otpInformation = $stateParams.hasOtp || JSON.parse($scope.hasOtp);
-[https://www.poste.it/cerca-app/js/module/svincola-start-controller.js]         $scope.codice = $stateParams.codice;
-[https://www.poste.it/cerca-app/js/module/svincola-start-controller.js]         $scope.hasOtp = $stateParams.hasOtp;
-[https://www.poste.it/cerca-app/js/module/svincola-start-controller.js]         $stateParams.codice = SessionStorageService.get('lastStateParams').codice;;
-[https://www.poste.it/cerca-app/js/module/svincola-start-controller.js]         $stateParams.hasOtp = JSON.parse($scope.hasOtp);
-[https://www.poste.it/cerca-app/js/module/svincola-start-controller.js]         SessionStorageService.set('lastStateParams', { codice: $stateParams.codice, hasOtp: $scope.hasOtp });
-[https://www.poste.it/cerca-app/js/module/dynamic-svincola-start-directive.js] 			$scope.codice = $stateParams.codice;
-[https://www.poste.it/cerca-app/js/module/svincola-options-controller.js] 	$scope.svincolaData = $stateParams.svincolaData || SessionStorageService.get('lastStateParams').svincolaData;
-[https://www.poste.it/cerca-app/js/module/svincola-options-controller.js] 		$state.go('/svincola', { codice: $stateParams.codice || SessionStorageService.get('ldv').codice, hasOtp: $stateParams.hasOtp });
-[https://www.poste.it/cerca-app/js/module/svincola-options-controller.js] 	if ($stateParams.codice) {
-[https://www.poste.it/cerca-app/js/module/svincola-options-controller.js] 		$scope.codice = $stateParams.codice;
-[https://www.poste.it/cerca-app/js/module/svincolo-controller.js]     if ($stateParams.svincoloObj && $stateParams.action) {
-[https://www.poste.it/cerca-app/js/module/svincolo-controller.js]         $scope.svincoloObj = $stateParams.svincoloObj;
-[https://www.poste.it/cerca-app/js/module/svincolo-controller.js]         $scope.action = $stateParams.action;
-[https://www.poste.it/cerca-app/js/module/svincolo-controller.js]     } else if (!$stateParams.svincoloObj && lastInformation.svincoloObj) {
-[https://www.poste.it/cerca-app/js/module/svincolo-controller.js]         $state.go('/svincola',{codice:$stateParams.codice})
-[https://www.poste.it/cerca-app/js/module/second-part-form-directive.js] 				$state.go('/opzioni-di-svincolo',{codice:$stateParams.codice});						
-[https://www.poste.it/cerca-app/js/module/fine-controller.js] 	$scope.doSvincoloError = $stateParams.error;
-[https://www.poste.it/cerca-app/js/module/fine-controller.js] 		SessionStorageService.set('error', $stateParams.error);
-html: 														var elem = angular.element('[ng-app]')
-html:       <body ng-app="CercaSpedizioni" >
-html:           <div ui-view></div> 
+angular header:    /*  AngularJS v1.5.0  (c) 2010-2016 Google, Inc. http://angularjs.org  License: MIT */ (function(O,W,v){'use 
+hashPrefix in app.js: False
+html5Mode in app.js: False
+route-config.js: hashPrefix=False html5Mode=False
+app-run.js: hashPrefix=False html5Mode=False
+libs.js: hashPrefix=False html5Mode=False
