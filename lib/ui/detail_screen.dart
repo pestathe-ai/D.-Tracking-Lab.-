@@ -4,7 +4,8 @@ import 'package:flutter/services.dart';
 import '../core/carriers.dart';
 import '../core/models.dart';
 import '../services/store.dart';
-import 'page_screen.dart';
+import 'package:url_launcher/url_launcher.dart';
+
 import 'place_picker.dart';
 import 'style.dart';
 
@@ -232,12 +233,17 @@ class _Detail extends StatelessWidget {
                 _EventRow(event: s.events[i], first: i == 0, last: i == s.events.length - 1, color: color),
             const SizedBox(height: 24),
             OutlinedButton.icon(
-              onPressed: () => Navigator.of(context).push(MaterialPageRoute<void>(
-                builder: (_) => PageScreen(
-                  title: carrier.id == 'other' ? 'Tracking' : carrier.name,
-                  uri: carrier.trackingUri(s.number),
-                ),
-              )),
+              // Scheda del browser del telefono sopra l'app: i siti dei corrieri
+              // (es. Poste con reCAPTCHA) funzionano come nel browser.
+              onPressed: () async {
+                final messenger = ScaffoldMessenger.of(context);
+                final ok = await launchUrl(carrier.trackingUri(s.number),
+                    mode: LaunchMode.inAppBrowserView);
+                if (!ok) {
+                  messenger.showSnackBar(
+                      const SnackBar(content: Text('Non riesco ad aprire il browser del telefono')));
+                }
+              },
               icon: const Icon(Icons.public_rounded),
               label: const Text('Mostra la pagina originale del corriere'),
             ),

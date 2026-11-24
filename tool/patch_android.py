@@ -15,6 +15,20 @@ for p in perms:
     if p not in m:
         m = m.replace("<application", f'<uses-permission android:name="{p}"/>\n    <application', 1)
 
+if "<queries>" not in m:
+    # Permette di aprire i siti dei corrieri nel browser del telefono (Android 11+).
+    queries = """    <queries>
+        <intent>
+            <action android:name="android.intent.action.VIEW"/>
+            <data android:scheme="https"/>
+        </intent>
+        <intent>
+            <action android:name="android.support.customtabs.action.CustomTabsService"/>
+        </intent>
+    </queries>
+</manifest>"""
+    m = m.replace("</manifest>", queries, 1)
+
 if "ShareTrampolineActivity" not in m:
     activity = '''
         <activity

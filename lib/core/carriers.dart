@@ -98,7 +98,8 @@ const carriers = <Carrier>[
     patterns: [r'\d{13}', r'[0-9A-Z]{13}'],
     keywords: ['sda'],
     urlTemplate:
-        'https://www.sda.it/wps/portal/Servizi_online/dettaglio-spedizione?locale=it&tracing.letteraVettura={n}',
+        // I servizi corriere SDA sono passati a Poste: si cerca su poste.it.
+        'https://www.poste.it/cerca/index.html#/risultati-spedizioni/{n}',
   ),
   Carrier(
     id: 'dhl',

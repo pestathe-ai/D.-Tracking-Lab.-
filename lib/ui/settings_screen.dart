@@ -176,7 +176,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 child: Text(_keyInfo!, style: theme.textTheme.bodyMedium),
               ),
             const SizedBox(height: 32),
-            Center(child: Text('D. Tracking lab · versione 0.6', style: muted)),
+            Center(child: Text('D. Tracking lab · versione 0.6.1', style: muted)),
             const SizedBox(height: 4),
             Center(child: Text('un\'app Dom Studio', style: theme.textTheme.bodySmall)),
           ],
