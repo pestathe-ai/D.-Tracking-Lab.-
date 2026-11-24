@@ -5,15 +5,14 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../core/carriers.dart';
 import '../core/models.dart';
-import '../core/page_parser.dart';
-import 'page_reader.dart';
+import 'carrier_sources.dart';
 import 'track17.dart';
 
 /// Tutti i pacchi, salvati sul telefono, e il loro aggiornamento.
 class ShipmentStore extends ChangeNotifier {
-  ShipmentStore(this.reader);
+  ShipmentStore({CarrierSources? sources}) : sources = sources ?? CarrierSources();
 
-  final PageReader reader;
+  final CarrierSources sources;
   final List<Shipment> _items = [];
   final Set<String> _refreshing = {};
   String apiKey = '';
@@ -164,9 +163,31 @@ class ShipmentStore extends ChangeNotifier {
     _refreshing.add(s.id);
     notifyListeners();
     try {
+      final carrier = carrierById(s.carrierId);
       var done = false;
-      if (apiKey.isNotEmpty) done = await _refreshWith17(s);
-      if (!done) await _refreshFromPage(s);
+      // 1) Servizio pubblico del corriere: gratis, senza account.
+      if (sources.supports(s.carrierId)) {
+        done = await _refreshDirect(s);
+      } else if (s.carrierId == 'other') {
+        // Corriere sconosciuto: proviamo quelli leggibili compatibili col formato.
+        for (final c in detectCarriers(s.number)) {
+          if (!sources.supports(c.id)) continue;
+          final previous = s.carrierId;
+          s.carrierId = c.id;
+          done = await _refreshDirect(s, quietNotFound: true);
+          if (done) break;
+          s.carrierId = previous;
+        }
+      }
+      // 2) Facoltativo: 17TRACK, se l'utente ha messo la chiave.
+      if (!done && apiKey.isNotEmpty) done = await _refreshWith17(s);
+      if (!done && s.error == null) {
+        s.error = sources.supports(s.carrierId)
+            ? null
+            : '${carrier.name} non permette la lettura automatica gratuita del suo sito. '
+                'Puoi vedere lo stato con "Mostra la pagina originale del corriere" qui sotto '
+                'oppure aggiungere una chiave 17TRACK nelle impostazioni.';
+      }
       s.lastChecked = DateTime.now();
     } catch (e) {
       s.error = 'Aggiornamento non riuscito: $e';
@@ -174,6 +195,34 @@ class ShipmentStore extends ChangeNotifier {
       _refreshing.remove(s.id);
       await _save();
       notifyListeners();
+    }
+  }
+
+  /// true se il corriere ha restituito informazioni sul pacco.
+  Future<bool> _refreshDirect(Shipment s, {bool quietNotFound = false}) async {
+    final carrier = carrierById(s.carrierId);
+    try {
+      final r = await sources.fetch(s.carrierId, s.number);
+      if (r.notFound) {
+        if (!quietNotFound) {
+          s.status = ShipStatus.notFound;
+          s.error = '${carrier.name} non trova ancora questo numero. Se il pacco è appena stato '
+              'spedito, riprova tra qualche ora; altrimenti controlla di aver scelto il corriere giusto.';
+        }
+        return false;
+      }
+      s.status = r.status;
+      if (r.events.isNotEmpty) s.events = r.events;
+      s.eta = r.eta ?? (s.status == ShipStatus.delivered ? null : s.eta);
+      s.note = r.detail ?? s.note;
+      s.error = null;
+      return true;
+    } on SourceException catch (e) {
+      s.error = e.message;
+      return false;
+    } catch (e) {
+      s.error = 'Risposta di ${carrier.name} non riconosciuta. Riprova più tardi.';
+      return false;
     }
   }
 
@@ -196,27 +245,6 @@ class ShipmentStore extends ChangeNotifier {
     } on Track17Exception {
       return false; // si passa alla lettura della pagina, che è gratuita
     }
-  }
-
-  Future<void> _refreshFromPage(Shipment s) async {
-    final carrier = carrierById(s.carrierId);
-    final text = await reader.readText(carrier.trackingUri(s.number), mustContain: s.number);
-    if (text.trim().isEmpty) {
-      s.error = 'La pagina di ${carrier.name} non ha risposto. Riprova più tardi.';
-      return;
-    }
-    final r = parseTrackingPage(text, s.number);
-    if (!r.foundNumber && r.events.isEmpty) {
-      s.error = r.status == ShipStatus.notFound
-          ? '${carrier.name} non trova ancora questo numero. Se è appena stato spedito, riprova tra qualche ora; altrimenti controlla il corriere.'
-          : 'Non sono riuscito a leggere la pagina di ${carrier.name}. Prova a cambiare corriere o riprova più tardi.';
-      if (r.status == ShipStatus.notFound) s.status = ShipStatus.notFound;
-      return;
-    }
-    s.status = r.status;
-    if (r.events.isNotEmpty) s.events = r.events;
-    s.eta = r.eta ?? (s.status == ShipStatus.delivered ? null : s.eta);
-    s.error = null;
   }
 
   @visibleForTesting

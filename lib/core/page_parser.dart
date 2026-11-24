@@ -172,10 +172,10 @@ PageReading parseTrackingPage(String text, String number, {DateTime? now}) {
   // Stato: prima dall'evento più recente, poi dall'intero testo del pacco.
   ShipStatus status = ShipStatus.pending;
   if (unique.isNotEmpty) {
-    status = _classify(unique.first.description) ?? ShipStatus.pending;
+    status = classifyText(unique.first.description) ?? ShipStatus.pending;
   }
   if (status == ShipStatus.pending) {
-    status = _classify(body) ?? (found ? ShipStatus.inTransit : ShipStatus.pending);
+    status = classifyText(body) ?? (found ? ShipStatus.inTransit : ShipStatus.pending);
   }
 
   // Data prevista.
@@ -197,7 +197,8 @@ final _etaRe = RegExp(
     r'(consegna prevista|data (di consegna )?prevista|previst[ao]|arrivo previsto|expected delivery|estimated delivery|delivery by)[^\n]{0,60}',
     caseSensitive: false);
 
-ShipStatus? _classify(String text) {
+/// Stato suggerito da una frase (italiano o inglese), o null.
+ShipStatus? classifyText(String text) {
   for (final (status, re) in _rules) {
     if (re.hasMatch(text)) return status;
   }

@@ -85,6 +85,7 @@ class Shipment {
     this.registered = false,
     this.error,
     this.serviceCarrier,
+    this.note,
   });
 
   final String id;
@@ -105,6 +106,9 @@ class Shipment {
 
   /// Nome del corriere secondo il servizio di tracking.
   String? serviceCarrier;
+
+  /// Informazione in più dal corriere (es. locker di ritiro).
+  String? note;
 
   TrackEvent? get latest => events.isEmpty ? null : events.first;
 
@@ -129,6 +133,7 @@ class Shipment {
         'registered': registered,
         'error': error,
         'svc': serviceCarrier,
+        'note': note,
       };
 
   factory Shipment.fromJson(Map<String, dynamic> j) => Shipment(
@@ -148,5 +153,6 @@ class Shipment {
         registered: j['registered'] as bool? ?? false,
         error: j['error'] as String?,
         serviceCarrier: j['svc'] as String?,
+        note: j['note'] as String?,
       );
 }

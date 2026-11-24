@@ -151,6 +151,12 @@ class _Detail extends StatelessWidget {
               margin: EdgeInsets.zero,
               child: Column(
                 children: [
+                  if (s.note != null)
+                    ListTile(
+                      leading: const Icon(Icons.place_outlined),
+                      title: Text(s.note!),
+                      subtitle: const Text('Dove ritirarlo'),
+                    ),
                   ListTile(
                     leading: const Icon(Icons.storefront_outlined),
                     title: Text(s.shop ?? 'Negozio non indicato'),

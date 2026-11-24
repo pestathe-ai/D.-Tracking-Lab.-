@@ -1,9 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:webview_flutter/webview_flutter.dart';
 
-import 'services/page_reader.dart';
 import 'services/share_channel.dart';
 import 'services/store.dart';
 import 'ui/add_screen.dart';
@@ -24,7 +22,6 @@ class TrackingLabApp extends StatefulWidget {
 
 class _TrackingLabAppState extends State<TrackingLabApp> {
   final _navigator = GlobalKey<NavigatorState>();
-  late final PageReader _reader;
   late final ShipmentStore _store;
   late final ShareChannel _share;
   StreamSubscription<IncomingShare>? _sub;
@@ -32,8 +29,7 @@ class _TrackingLabAppState extends State<TrackingLabApp> {
   @override
   void initState() {
     super.initState();
-    _reader = PageReader();
-    _store = ShipmentStore(_reader);
+    _store = ShipmentStore();
     _share = ShareChannel();
     _start();
   }
@@ -71,25 +67,6 @@ class _TrackingLabAppState extends State<TrackingLabApp> {
       theme: buildTheme(Brightness.light),
       darkTheme: buildTheme(Brightness.dark),
       themeMode: ThemeMode.system,
-      builder: (context, child) => Stack(
-        children: [
-          // Browser invisibile che legge le pagine dei corrieri:
-          // sta sotto l'interfaccia, non si vede e non si tocca.
-          Positioned(
-            left: 0,
-            top: 0,
-            width: 380,
-            height: 760,
-            child: IgnorePointer(
-              child: Opacity(
-                opacity: 0.01,
-                child: WebViewWidget(controller: _reader.controller),
-              ),
-            ),
-          ),
-          Positioned.fill(child: child ?? const SizedBox.shrink()),
-        ],
-      ),
       home: HomeScreen(store: _store, onAdd: () => _openAdd()),
     );
   }
