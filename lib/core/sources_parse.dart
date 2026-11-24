@@ -159,7 +159,9 @@ String htmlToText(String html) {
 /// Pagina di risultato di vas.brt.it (sped_det_show).
 SourceResult parseBrtHtml(String html, String number, {DateTime? now}) {
   final text = htmlToText(html);
-  if (RegExp(r'TIS0564|Spedizione non trovata|non trovata oppure ancora in elaborazione',
+  if (RegExp(
+          r'TIS0564|TIS0868|Spedizione non trovata|non trovata oppure ancora in elaborazione|'
+          r'Parcel label number \S+ non trovato|BRTcode \S+ non valido',
           caseSensitive: false)
       .hasMatch(text)) {
     return const SourceResult(status: ShipStatus.notFound, notFound: true);

@@ -113,7 +113,8 @@ const carriers = <Carrier>[
     name: 'DPD',
     patterns: [r'\d{14}'],
     keywords: ['dpd'],
-    urlTemplate: 'https://tracking.dpd.de/status/it_IT/parcel/{n}',
+    // In Italia DPD è consegnato da BRT: pagina BRT in italiano.
+    urlTemplate: 'https://www.mybrt.it/it/mybrt/my-parcels/search?parcelNumber={n}',
   ),
   Carrier(
     id: 'fedex',

@@ -78,6 +78,12 @@ void main() {
       expect(r.eta, DateTime(2026, 11, 25));
     });
 
+    test('numero DPD non trovato (risposta reale)', () {
+      const html = '<div>Errori riscontrati</div><div>Ritorno</div>'
+          '<p>TIS0868 Parcel label number 05212345678901 non trovato</p>';
+      expect(parseBrtHtml(html, '05212345678901').notFound, isTrue);
+    });
+
     test('html in testo', () {
       expect(htmlToText('<td>A&amp;B</td><td>&agrave; posto</td>'), 'A&B | à posto');
     });

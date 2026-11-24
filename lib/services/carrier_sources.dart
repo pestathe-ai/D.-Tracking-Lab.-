@@ -16,12 +16,13 @@ class CarrierSources {
       '(KHTML, like Gecko) Chrome/130.0 Mobile Safari/537.36';
 
   /// Corrieri letti direttamente dall'app.
-  static const supported = {'brt', 'inpost', 'poste', 'amazon'};
+  static const supported = {'brt', 'dpd', 'inpost', 'poste', 'amazon'};
 
   bool supports(String carrierId) => supported.contains(carrierId);
 
   Future<SourceResult> fetch(String carrierId, String number) => switch (carrierId) {
-        'brt' => _brt(number),
+        // In Italia i pacchi DPD li consegna BRT, che li rintraccia col suo modulo.
+        'brt' || 'dpd' => _brt(number),
         'inpost' => _inpost(number),
         'poste' => _poste(number),
         'amazon' => _amazon(number),
@@ -63,8 +64,8 @@ class CarrierSources {
   // BRT: pagina pubblica di vas.brt.it, generata dal server.
   Future<SourceResult> _brt(String number) async {
     final http.Response res;
-    if (number.length == 19) {
-      // BRTcode (19 cifre): modulo dedicato.
+    if (number.length == 19 || number.length == 14) {
+      // BRTcode (19 cifre) o numero DPD (14 cifre): modulo dedicato.
       res = await _send(_client.post(
         Uri.https('vas.brt.it', '/vas/sped_det_show.htm'),
         headers: {..._headers(accept: 'text/html'), 'Content-Type': 'application/x-www-form-urlencoded'},
