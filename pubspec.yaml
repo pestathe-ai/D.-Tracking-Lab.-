@@ -1,7 +1,7 @@
 name: d_tracking_lab
 description: "D. Tracking lab: tutti i tuoi pacchi in un posto, gratis."
 publish_to: 'none'
-version: 0.5.0+5
+version: 0.6.0+6
 
 environment:
   sdk: ^3.8.0

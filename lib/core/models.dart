@@ -87,6 +87,8 @@ class Shipment {
     this.serviceCarrier,
     this.note,
     this.place,
+    this.sent = false,
+    this.recipient,
   });
 
   final String id;
@@ -114,11 +116,18 @@ class Shipment {
   /// Dove arriva il pacco (Casa, Ufficio, un locker…): stesso luogo, stesso colore.
   String? place;
 
+  /// Pacco spedito da te (sezione "Spediti"), non ricevuto.
+  bool sent;
+
+  /// A chi l'hai spedito (solo per i pacchi spediti).
+  String? recipient;
+
   TrackEvent? get latest => events.isEmpty ? null : events.first;
 
   String get title {
     if (name != null && name!.trim().isNotEmpty) return name!.trim();
-    if (shop != null && shop!.isNotEmpty) return 'Pacco $shop';
+    if (sent && recipient != null && recipient!.isNotEmpty) return 'Per $recipient';
+    if (!sent && shop != null && shop!.isNotEmpty) return 'Pacco $shop';
     return number;
   }
 
@@ -139,6 +148,8 @@ class Shipment {
         'svc': serviceCarrier,
         'note': note,
         'place': place,
+        'sent': sent,
+        'recipient': recipient,
       };
 
   factory Shipment.fromJson(Map<String, dynamic> j) => Shipment(
@@ -160,5 +171,7 @@ class Shipment {
         serviceCarrier: j['svc'] as String?,
         note: j['note'] as String?,
         place: j['place'] as String?,
+        sent: j['sent'] as bool? ?? false,
+        recipient: j['recipient'] as String?,
       );
 }

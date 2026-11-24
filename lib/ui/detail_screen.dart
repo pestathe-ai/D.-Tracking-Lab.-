@@ -167,15 +167,28 @@ class _Detail extends StatelessWidget {
                           ),
                     onTap: () => _edit(context),
                   ),
-                  ListTile(
-                    leading: const Icon(Icons.storefront_outlined),
-                    title: Align(
-                      alignment: Alignment.centerLeft,
-                      child: s.shop == null ? const Text('Negozio non indicato') : ShopBadge(s.shop!, large: true),
+                  if (s.sent)
+                    ListTile(
+                      leading: const Icon(Icons.call_made_rounded),
+                      title: Align(
+                        alignment: Alignment.centerLeft,
+                        child: s.recipient == null
+                            ? const Text('Destinatario non indicato')
+                            : RecipientBadge(s.recipient!, large: true),
+                      ),
+                      subtitle: const Text('Spedito da te a'),
+                      onTap: () => _edit(context),
+                    )
+                  else
+                    ListTile(
+                      leading: const Icon(Icons.storefront_outlined),
+                      title: Align(
+                        alignment: Alignment.centerLeft,
+                        child: s.shop == null ? const Text('Negozio non indicato') : ShopBadge(s.shop!, large: true),
+                      ),
+                      subtitle: const Text('Negozio'),
+                      onTap: () => _edit(context),
                     ),
-                    subtitle: const Text('Negozio'),
-                    onTap: () => _edit(context),
-                  ),
                   ListTile(
                     leading: const Icon(Icons.local_shipping_outlined),
                     title: Text(carrier.id == 'other' ? (s.serviceCarrier ?? carrier.name) : carrier.name),
@@ -239,6 +252,8 @@ class _Detail extends StatelessWidget {
     final shop = TextEditingController(text: s.shop ?? '');
     var carrierId = s.carrierId;
     String? place = s.place;
+    var sent = s.sent;
+    final recipient = TextEditingController(text: s.recipient ?? '');
     final saved = await showModalBottomSheet<bool>(
       context: context,
       isScrollControlled: true,
@@ -257,14 +272,27 @@ class _Detail extends StatelessWidget {
                 textCapitalization: TextCapitalization.sentences,
                 decoration: const InputDecoration(labelText: 'Nome', border: OutlineInputBorder()),
               ),
-              const SizedBox(height: 12),
-              TextField(
-                controller: shop,
-                textCapitalization: TextCapitalization.words,
-                decoration: const InputDecoration(labelText: 'Negozio', border: OutlineInputBorder()),
+              SwitchListTile(
+                contentPadding: EdgeInsets.zero,
+                title: const Text('L\'ho spedito io'),
+                subtitle: const Text('Lo sposta nella sezione "Spediti"'),
+                value: sent,
+                onChanged: (v) => setSheet(() => sent = v),
               ),
+              if (sent)
+                TextField(
+                  controller: recipient,
+                  textCapitalization: TextCapitalization.words,
+                  decoration: const InputDecoration(labelText: 'Destinatario', border: OutlineInputBorder()),
+                )
+              else
+                TextField(
+                  controller: shop,
+                  textCapitalization: TextCapitalization.words,
+                  decoration: const InputDecoration(labelText: 'Negozio', border: OutlineInputBorder()),
+                ),
               const SizedBox(height: 14),
-              Text('Dove arriva', style: Theme.of(c).textTheme.labelLarge),
+              Text(sent ? 'Dove va' : 'Dove arriva', style: Theme.of(c).textTheme.labelLarge),
               const SizedBox(height: 6),
               PlacePicker(store: store, value: place, onChanged: (v) => setSheet(() => place = v)),
               const SizedBox(height: 14),
@@ -287,6 +315,8 @@ class _Detail extends StatelessWidget {
     if (saved != true) return;
     s.name = name.text.trim().isEmpty ? null : name.text.trim();
     s.shop = shop.text.trim().isEmpty ? null : shop.text.trim();
+    s.sent = sent;
+    s.recipient = recipient.text.trim().isEmpty ? null : recipient.text.trim();
     final carrierChanged = carrierId != s.carrierId;
     s.carrierId = carrierId;
     await store.setPlace(s, place);

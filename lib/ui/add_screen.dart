@@ -14,11 +14,14 @@ import 'scan_screen.dart';
 /// Aggiunta di un pacco. Se arriva testo da un'altra app, numero,
 /// corriere e negozio vengono compilati da soli.
 class AddScreen extends StatefulWidget {
-  const AddScreen({super.key, required this.store, this.initialText, this.source});
+  const AddScreen({super.key, required this.store, this.initialText, this.source, this.sent = false});
 
   final ShipmentStore store;
   final String? initialText;
   final String? source;
+
+  /// Apre già impostato su "L'ho spedito".
+  final bool sent;
 
   @override
   State<AddScreen> createState() => _AddScreenState();
@@ -36,6 +39,8 @@ class _AddScreenState extends State<AddScreen> {
   String? _error;
   bool _saving = false;
   String? _place;
+  late bool _sent = widget.sent;
+  final _recipient = TextEditingController();
 
   @override
   void initState() {
@@ -62,6 +67,7 @@ class _AddScreenState extends State<AddScreen> {
     _number.dispose();
     _name.dispose();
     _shop.dispose();
+    _recipient.dispose();
     super.dispose();
   }
 
@@ -123,6 +129,8 @@ class _AddScreenState extends State<AddScreen> {
       carrierId: _carrierId,
       name: _name.text,
       shop: _shop.text,
+      sent: _sent,
+      recipient: _recipient.text,
     );
     if (_place != null) await widget.store.setPlace(s, _place);
     unawaited(widget.store.refresh(s));
@@ -144,10 +152,19 @@ class _AddScreenState extends State<AddScreen> {
     ];
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Nuovo pacco')),
+      appBar: AppBar(title: Text(_sent ? 'Nuovo pacco spedito' : 'Nuovo pacco')),
       body: ListView(
         padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
         children: [
+          SegmentedButton<bool>(
+            segments: const [
+              ButtonSegment(value: false, icon: Icon(Icons.call_received_rounded), label: Text('Lo ricevo')),
+              ButtonSegment(value: true, icon: Icon(Icons.call_made_rounded), label: Text('L\'ho spedito')),
+            ],
+            selected: {_sent},
+            onSelectionChanged: (v) => setState(() => _sent = v.first),
+          ),
+          const SizedBox(height: 18),
           TextField(
             controller: _number,
             autofocus: widget.initialText == null,
@@ -228,7 +245,18 @@ class _AddScreenState extends State<AddScreen> {
             }),
           ),
           const SizedBox(height: 20),
-          TextField(
+          if (_sent)
+            TextField(
+              controller: _recipient,
+              textCapitalization: TextCapitalization.words,
+              decoration: const InputDecoration(
+                labelText: 'Destinatario',
+                hintText: 'A chi l\'hai spedito',
+                border: OutlineInputBorder(),
+                prefixIcon: Icon(Icons.person_outline_rounded),
+              ),
+            ),
+          if (!_sent) TextField(
             controller: _shop,
             textCapitalization: TextCapitalization.words,
             decoration: const InputDecoration(
@@ -239,8 +267,8 @@ class _AddScreenState extends State<AddScreen> {
             ),
             onChanged: (_) => setState(() {}),
           ),
-          const SizedBox(height: 8),
-          Wrap(
+          if (!_sent) const SizedBox(height: 8),
+          if (!_sent) Wrap(
             spacing: 8,
             runSpacing: 4,
             children: [
@@ -249,7 +277,7 @@ class _AddScreenState extends State<AddScreen> {
             ],
           ),
           const SizedBox(height: 20),
-          Text('Dove arriva (facoltativo)', style: theme.textTheme.labelLarge),
+          Text(_sent ? 'Dove va (facoltativo)' : 'Dove arriva (facoltativo)', style: theme.textTheme.labelLarge),
           const SizedBox(height: 6),
           PlacePicker(store: widget.store, value: _place, onChanged: (v) => setState(() => _place = v)),
           const SizedBox(height: 20),

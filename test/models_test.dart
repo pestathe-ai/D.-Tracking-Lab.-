@@ -40,4 +40,14 @@ void main() {
     final s = Shipment(id: '2', number: 'X1', carrierId: 'brt', createdAt: DateTime(2026), place: 'Ufficio');
     expect(Shipment.fromJson(s.toJson()).place, 'Ufficio');
   });
+
+  test('pacco spedito: destinatario e titolo', () {
+    final s = Shipment(
+        id: '3', number: 'X2', carrierId: 'brt', createdAt: DateTime(2026), sent: true, recipient: 'Marco', shop: 'eBay');
+    final back = Shipment.fromJson(s.toJson());
+    expect(back.sent, isTrue);
+    expect(back.recipient, 'Marco');
+    expect(back.title, 'Per Marco');
+    expect(Shipment.fromJson({'id': '4', 'number': 'X3'}).sent, isFalse);
+  });
 }

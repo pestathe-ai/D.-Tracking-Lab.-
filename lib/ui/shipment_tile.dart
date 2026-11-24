@@ -97,7 +97,8 @@ class ShipmentTile extends StatelessWidget {
                         runSpacing: 4,
                         crossAxisAlignment: WrapCrossAlignment.center,
                         children: [
-                          if (s.shop != null) ShopBadge(s.shop!),
+                          if (!s.sent && s.shop != null) ShopBadge(s.shop!),
+                          if (s.sent && s.recipient != null) RecipientBadge(s.recipient!),
                           if (place != null) PlaceBadge(place, pColor!),
                           Text(carrierName, style: theme.textTheme.bodySmall),
                         ],

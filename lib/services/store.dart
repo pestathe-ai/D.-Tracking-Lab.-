@@ -115,13 +115,17 @@ class ShipmentStore extends ChangeNotifier {
     required String carrierId,
     String? name,
     String? shop,
+    bool sent = false,
+    String? recipient,
   }) async {
     final s = Shipment(
       id: DateTime.now().microsecondsSinceEpoch.toString(),
       number: normalizeNumber(number),
       carrierId: carrierId,
       name: (name?.trim().isEmpty ?? true) ? null : name!.trim(),
-      shop: (shop?.trim().isEmpty ?? true) ? null : shop!.trim(),
+      shop: sent || (shop?.trim().isEmpty ?? true) ? null : shop!.trim(),
+      sent: sent,
+      recipient: !sent || (recipient?.trim().isEmpty ?? true) ? null : recipient!.trim(),
       createdAt: DateTime.now(),
     );
     _items.add(s);

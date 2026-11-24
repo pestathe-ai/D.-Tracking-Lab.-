@@ -23,6 +23,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   String? _clipNumber;
   String? _placeFilter;
+  bool _showSent = false;
   String _clipText = '';
 
   ShipmentStore get store => widget.store;
@@ -90,7 +91,10 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       builder: (context, _) {
         final places = store.places;
         if (_placeFilter != null && !places.contains(_placeFilter)) _placeFilter = null;
+        final incomingCount = store.active.where((s) => !s.sent).length;
+        final sentCount = store.active.where((s) => s.sent).length;
         final active = store.active
+            .where((s) => s.sent == _showSent)
             .where((s) => _placeFilter == null || s.place == _placeFilter)
             .toList();
         final attention = active.where((s) => s.status.needsAttention).toList();
@@ -129,9 +133,11 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
             ],
           ),
           floatingActionButton: FloatingActionButton.extended(
-            onPressed: widget.onAdd,
+            onPressed: () => Navigator.of(context).push(MaterialPageRoute<void>(
+              builder: (_) => AddScreen(store: store, sent: _showSent),
+            )),
             icon: const Icon(Icons.add_rounded),
-            label: const Text('Aggiungi'),
+            label: Text(_showSent ? 'Aggiungi spedito' : 'Aggiungi'),
           ),
           body: !store.loaded
               ? const Center(child: CircularProgressIndicator())
@@ -141,13 +147,44 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                     physics: const AlwaysScrollableScrollPhysics(),
                     padding: const EdgeInsets.only(top: 4, bottom: 100),
                     children: [
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(16, 4, 16, 6),
+                        child: SegmentedButton<bool>(
+                          showSelectedIcon: false,
+                          segments: [
+                            ButtonSegment(
+                              value: false,
+                              icon: const Icon(Icons.call_received_rounded),
+                              label: Text('In arrivo ($incomingCount)'),
+                            ),
+                            ButtonSegment(
+                              value: true,
+                              icon: const Icon(Icons.call_made_rounded),
+                              label: Text('Spediti ($sentCount)'),
+                            ),
+                          ],
+                          selected: {_showSent},
+                          onSelectionChanged: (v) => setState(() => _showSent = v.first),
+                        ),
+                      ),
                       if (_clipNumber != null) _clipCard(theme),
                       if (places.length >= 2) _placeFilterBar(places),
-                      if (active.isEmpty && _placeFilter == null) _empty(theme),
+                      if (active.isEmpty && _placeFilter == null && !_showSent) _empty(theme),
+                      if (active.isEmpty && _placeFilter == null && _showSent)
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(32, 48, 32, 12),
+                          child: Text(
+                            'Nessun pacco spedito.\nTocca "Aggiungi spedito" per seguire un pacco che hai mandato tu: '
+                            'resi, vendite su Vinted o eBay, regali.',
+                            textAlign: TextAlign.center,
+                            style: theme.textTheme.bodyMedium
+                                ?.copyWith(color: theme.colorScheme.onSurfaceVariant, height: 1.5),
+                          ),
+                        ),
                       if (active.isEmpty && _placeFilter != null)
                         Padding(
                           padding: const EdgeInsets.all(32),
-                          child: Text('Nessun pacco in arrivo a "$_placeFilter".',
+                          child: Text(_showSent ? 'Nessun pacco spedito verso "$_placeFilter".' : 'Nessun pacco in arrivo a "$_placeFilter".',
                               textAlign: TextAlign.center, style: theme.textTheme.bodyMedium),
                         ),
                       if (attention.isNotEmpty) ...[

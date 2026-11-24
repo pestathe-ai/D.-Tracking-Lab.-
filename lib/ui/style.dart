@@ -191,3 +191,38 @@ class PlaceBadge extends StatelessWidget {
     );
   }
 }
+
+/// Etichetta del destinatario (pacchi spediti): contorno colorato e omino.
+class RecipientBadge extends StatelessWidget {
+  const RecipientBadge(this.name, {super.key, this.large = false});
+  final String name;
+  final bool large;
+
+  @override
+  Widget build(BuildContext context) {
+    final color = shopColor(name);
+    final dark = Theme.of(context).brightness == Brightness.dark;
+    final text = dark ? color : Color.lerp(color, Colors.black, 0.45)!;
+    return Container(
+      padding: EdgeInsets.fromLTRB(large ? 8 : 6, large ? 4 : 2, large ? 12 : 9, large ? 4 : 2),
+      decoration: BoxDecoration(
+        border: Border.all(color: color, width: large ? 2 : 1.6),
+        borderRadius: BorderRadius.circular(20),
+        color: color.withValues(alpha: 0.10),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.person_rounded, size: large ? 16 : 13, color: text),
+          const SizedBox(width: 3),
+          Flexible(
+            child: Text(name,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(color: text, fontWeight: FontWeight.w700, fontSize: large ? 14 : 12)),
+          ),
+        ],
+      ),
+    );
+  }
+}
