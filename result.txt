@@ -1,278 +1,119 @@
-=== brt numero spedizione
-URL https://vas.brt.it/vas/sped_det_show.hsm?referer=sped_numspe_par.htm&Nspediz=123456789012
-HTTP 200 text/html
---- forms/inputs
-<form name="formLang" action="">
-<select id="sltLang" name="sltLang" size="1" onchange="Javascript: setCookieLang(document.formLang.sltLang.value);" title="Selettore lingua">
-<INPUT NAME=IDSESSIONE TYPE=HIDDEN VALUE="">
---- text
--->
-Errore
-BRT S.p.A.
-Home
-Benvenuto nell'area servizi on-line
-FAQ
-Rintraccia
-Ritiri
-Spedizione
-Servizi
-Tempi di consegna Italia
-Tempi di consegna DPD Europa
-Prenotazione ritiro
-Italiano
-English
-Français
-Deutsch
-Errori riscontrati
-Ritorno
-TIS0564 Spedizione non trovata oppure ancora in elaborazione nei nostri sistemi. Correggere il parametro immesso oppure attendere e ripetere successivamente la ricerca
-Area informativa
-Servizi BRT
-Servizi on-line
-Istruzioni per spedire
-Fuel surcharge
-Servizio clienti
-FAQ
-Area clienti
-Contatto commerciale
-Login
-In evidenza
-Ultime news
-Archivio news
-Archivio Newsletter
-Territorio
-Ricerca una filiale
-Istituzionale
-Profilo aziendale
-Video istituzionale
-L'azienda in cifre
-Qualità, sicurezza, ambiente
-L'organizzazione
-Lavora in BRT
-Legale
-Note legali
-Privacy
-Condizioni e termini d'uso
-Condizioni di trasporto
--->
-IT
-Web
-Master
--->
-BRT S.p.A.
-Tutti i diritti riservati - Codice fiscale 04507990150 - Registro Imprese Milano n. 04507990150 - Partita IVA IT04507990150
+=== brt DPD section
+Trak&Trace DPD -->
+		<style type="text/css">
+			input.submit {
+				border-radius: 5px; /* give the button curved corners */
+				-moz-border-radius: 5px;
+				-webkit-border-radius: 5px;
+			}
+			button {
+				border-radius: 5px;
+				-moz-border-radius: 5px;
+				-webkit-border-radius: 5px;
+			}
+			.warning-banner {
+				background-image: url('fe-web/img/alertIcon.png');
+				background-position: center left;
+			    background-position: center left 6px;
+				background-repeat: no-repeat;
+			    background-color: #FFFEAB;
+			    background-size: 30px;
+			    border: 1px solid #CFBC55;
+			    padding: 8px 12px 8px 45px;
+			    margin: 0 2px 10px 6px;
+			}
+			.warning-text {
+			    font-size: 13px;
+			}
+			.warning-text b {
+				text-decoration: none;
+				font-weight: bold;
+			    color: #C42416;
+			}
+			.warning-text b.black {
+			    color: #000;
+			}		
+                        .popup {
+                          display: none;
+                          position: fixed;
+                          top: 0;
+                          left: 0;
+                          width: 100%;
+                          height: 100%;
+                          background: rgba(0, 0, 0, 0.5);
+                          justify-content: center;
+                          align-items: center;
+                        }
 
-=== brt form
-URL https://vas.brt.it/vas/sped_numspe_par.htm
-HTTP 200 text/html
---- forms/inputs
-<form name="formLang" action="">
-<select id="sltLang" name="sltLang" size="1" onchange="Javascript: setCookieLang(document.formLang.sltLang.value);" title="Selettore lingua">
-<INPUT NAME=IDSESSIONE TYPE=HIDDEN VALUE="">
-<FORM action="sped_det_show.htm" method="post" name="formBrtCode" onSubmit="Javascript: return ValidateBrtCode();">
-<INPUT name="brtCode" size="19" maxlength="19" tabindex="1">
-<INPUT class="submit" type="submit"	name="RicercaBrtCode" id="inputRicercaBrtCode" value="Ricerca" title="Ricerca" tabindex="1">
-<INPUT type="hidden" name="referer" value="sped_numspe_par.htm">
-<INPUT type="hidden" name="nSpediz" value=""  maxlength="12">
-<FORM action="sped_det_show.hsm" method="post" name="numeroSpedizione" onSubmit="Javascript: return ValidateNSpediz();">
-<INPUT type="hidden" name="referer" value="sped_numspe_par.htm">
-<INPUT name="Nspediz" size="12" maxlength="12" tabindex="1">
-<INPUT class="submit" type="submit"
-				name="RicercaNumeroSpedizione" id="inputRicerca1" value="Ricerca"
-				title="Ricerca" tabindex="2">
-<FORM action="sped_det_show.hsm" method="post" name="ChiSono"
-	onSubmit="Javascript:return ValidateChiSono();">
-<INPUT
-	type="hidden" name="referer" value="sped_numspe_par.htm">
-<INPUT name="ChiSono" size="35" maxlength="35" tabindex="11">
-<INPUT name="ClienteMittente" size="7" maxlength="7"
-				tabindex="12">
-<INPUT name="DataInizioGiorno" size="1" maxlength="2" value='01' tabindex="13" >
-<INPUT name="DataInizioMese" size="1" maxlength="2" value='01' tabindex="14" >
-<INPUT name="DataInizioAnno" size="2" maxlength="4" value='0001' tabindex="15" >
-<INPUT name="DataInizio"
-				size="8" maxlength="10" tabindex="13">
-<INPUT name="DataFineGiorno" size="1" maxlength="2" value='31' tabindex="16" >
-<INPUT name="DataFineMese" size="1" maxlength="2" value='12' tabindex="17" >
-<INPUT name="DataFineAnno" size="2" maxlength="4" value='9999' tabindex="18" >
-<INPUT name="DataFine" size="8"
-				maxlength="10" tabindex="16">
-<INPUT class="submit" type="submit"
-				name="RicercaChiSono" id="inputRicerca2" value="Ricerca"
-				title="Ricerca" tabindex="19">
-<form action="sped_ricDocMit_load.hsm" method="post"
-	name="riferimentoMittente"
-	onSubmit="Javascript:return ValidateRiferimentoMittente();">
-<input
-	type="hidden" name="referer" value="sped_numspe_par.htm">
-<input name="KSU" size="7" maxlength="7" tabindex="20">
-<input name="DocMit" size="15" maxlength="15" tabindex="21">
-<input name="rma" size="22" maxlength="15" tabindex="22">
-<input class="submit" type="submit"
-				name="RicercaDocMit" value="Ricerca" id="inputRicerca3"
-				tabindex="23">
---- text
--->
-Rintraccia spedizione
-BRT S.p.A.
-Home
-Benvenuto nell'area servizi on-line
-FAQ
-Rintraccia
-Ritiri
-Spedizione
-Servizi
-Tempi di consegna Italia
-Tempi di consegna DPD Europa
-Prenotazione ritiro
-Italiano
-English
-Français
-Deutsch
-Rintraccia spedizione
-Ritorno
-Aiuto
-I
-campi obbligatori sono segnalati dal colore rosso
-Ricerca con BRTcode (spedizioni degli ultimi 12 mesi)
-BRTcode
-(19 cifre)
-Ricerca con numero spedizione (spedizioni degli ultimi 12 mesi)
-Numero spedizione
-(12 cifre)
-Ricerca con ID collo cliente (solo spedizioni degli ultimi 2 mesi)
-ID collo cliente
-Codice
-cliente mittente
-(7
-cifre)
-Dalla data
-.
-.
---> (gg.mm.aaaa)
-Alla data
-.
-.
---> (gg.mm.aaaa)
-Ricerca
-spedizione con riferimento mittente ( solo spedizioni
-degli ultimi 2 mesi )
-Codice cliente mittente
-(7 cifre)
-e
-Riferimento mittente
-numerico
-(1-15 cifre)
-oppure
-Riferimento mittente
-alfabetico
-(1-15 caratteri)
-Area informativa
-Servizi BRT
-Servizi on-line
-Istruzioni per spedire
-Fuel surcharge
-Servizio clienti
-FAQ
-Area clienti
-Contatto commerciale
-Login
-In evidenza
-Ultime news
-Archivio news
-Archivio Newsletter
-Territorio
-Ricerca una filiale
-Istituzionale
-Profilo aziendale
-Video istituzionale
-L'azienda in cifre
-Qualità, sicurezza, ambiente
-L'organizzazione
-Lavora in BRT
-Legale
-Note legali
-Privacy
-Condizioni e termini d'uso
-Condizioni di trasporto
--->
-IT
-Web
-Master
--->
-BRT S.p.A.
-Tutti i diritti riservati - Codice fiscale 04507990150 - Registro Imprese Milano n. 04507990150 - Partita IVA IT04507990150
+                        .popup-content {
+                          background: #fff;
+                          padding: 20px;
+                          border-radius: 5px;
+                          text-align: center;
+                        }
 
-=== brt segnacollo
-URL https://vas.brt.it/vas/sped_det_show.hsm?referer=sped_numspe_par.htm&ChiSono=123456789012345
-HTTP 200 text/html
---- forms/inputs
-<form name="formLang" action="">
-<select id="sltLang" name="sltLang" size="1" onchange="Javascript: setCookieLang(document.formLang.sltLang.value);" title="Selettore lingua">
-<INPUT NAME=IDSESSIONE TYPE=HIDDEN VALUE="">
---- text
--->
-Errore
-BRT S.p.A.
-Home
-Benvenuto nell'area servizi on-line
-FAQ
-Rintraccia
-Ritiri
-Spedizione
-Servizi
-Tempi di consegna Italia
-Tempi di consegna DPD Europa
-Prenotazione ritiro
-Italiano
-English
-Français
-Deutsch
-Errori riscontrati
-Ritorno
-Spedizione non trovata oppure ancora in elaborazione nei nostri sistemi. Correggere il parametro immesso oppure attendere e ripetere successivamente la ricerca
-Area informativa
-Servizi BRT
-Servizi on-line
-Istruzioni per spedire
-Fuel surcharge
-Servizio clienti
-FAQ
-Area clienti
-Contatto commerciale
-Login
-In evidenza
-Ultime news
-Archivio news
-Archivio Newsletter
-Territorio
-Ricerca una filiale
-Istituzionale
-Profilo aziendale
-Video istituzionale
-L'azienda in cifre
-Qualità, sicurezza, ambiente
-L'organizzazione
-Lavora in BRT
-Legale
-Note legali
-Privacy
-Condizioni e termini d'uso
-Condizioni di trasporto
--->
-IT
-Web
-Master
--->
-BRT S.p.A.
-Tutti i diritti riservati - Codice fiscale 04507990150 - Registro Imprese Milano n. 04507990150 - Partita IVA IT04507990150
+                        .close-btn {
+                          background-color: #4CAF50;
+                          border: none;
+                          color: white;
+                          padding: 10px 20px;
+                          text-align: center;
+                          text-decoration: none;
+                          display: inline-block;
+                          font-size: 16px;
+                          border-radius: 5px;
+                          cursor: pointer;
+                          margin-top: 20px;
+                        }
+		</style>
+		<!-- End Trak&Trace DPD -->
 
-=== inpost it real-format
-URL https://api-shipx-it.easypack24.net/v1/tracking/IT0000000000000000000000
-HTTP 404 application/json;charset=UTF-8
-{"trackingNumber":"IT0000000000000000000000","message":"Tracking information about IT0000000000000000000000 shipment has not been found."}
+<title>Rintraccia spedizione</title>
+<script type="text/javascript" src="js/ChkDateEUR.js"></script>
+<script type="text/javascript" src="js/sped_numspe_par.js?versione=1"></script>
+<script type="text/javascript" language="JavaScript" src="tigra_calendar/it/calendar.js"></script>
+<script type="text/javascript" language="JavaScript" src="tigra_calendar/calendar.js"></script>
 
-=== inpost it statuses
-URL https://api-shipx-it.easypack24.net/v1/statuses?lang=it_IT
-HTTP 200 application/json; charset=utf-8
-{"href":"http://api-shipx-it.easypack24.net/v1/statuses?lang=it_IT","items":[{"name":"created","title":"Parcel created.","description":"Parcel created, but not ready for shipment."},{"name":"confirmed","title":"Prepared by the Sender.","description":"The parcel will soon be handed over to us to reach you as quickly as possible."},{"name":"dispatched_by_sender","title":"Parcel shipped at the parcel machine.","description":"The parcel is waiting for the delivery man to take it out of the parcel machine. From there it will go to the nearest InPost branch and then to the collection parcel machine."},{"name":"taken_by_courier","title":"Picked up from Sender.","description":"The parcel was received from the Sender and set off on its way."},{"name":"out_for_delivery","title":"Handed over for deli
+<script type="text/javascript" language="JavaScript">
+	function ValidateBrtCode () {
+	    brtCode = String(document.formBrtCode.brtCode.value);
+		return true;
+    	try {document.formBrtCode.brtCode.value = brtCode.trim();}	catch(err) {} // IE8 non gestisce trim().
+    	brtCode = String(document.formBrtCode.brtCode.value);
+    	if (brtCode.length != 14 && brtCode.length != 19 || isNaN(brtCode) || brtCode.substring(0) < "0" || brtCode.substring(0) > "9"){     
+	       
+dpd ref: DPD,EuroExpress,FedEx
+dpd ref: DPD --
+dpd ref: DPD --
+dpd ref: DPD Europa
+dpd ref: DPDEuropa
+dpd ref: DPD Europa
+=== dpd plc json
+URL https://tracking.dpd.de/rest/plc/it_IT/05212345678901
+FINAL https://tracking.dpd.de/rest/plc/it_IT/05212345678901
+HTTP -1 None 53B
+ConnectionResetError(104, 'Connection reset by peer')
+
+=== dpd status page
+URL https://tracking.dpd.de/status/it_IT/parcel/05212345678901
+FINAL https://my.dpd.de/myparcels/dataprotection-tracking.aspx?zip=&
+HTTP 200 text/html; charset=utf-8 75732B
+ Datenschutz: Postleitzahl-Eingabe | Meine Pakete » myDPD Versenden Paketversand Express Internationaler Versand E-Commerce Brief Fulfillment Branchenlösungen Out of Home Versand Empfangen Paketverfolgung Paketshop/Station finden DPD App Abstell-Okay Retournieren Paketshop/Station finden Retouren-Management myDPD Meine Pakete Paket versenden Paketshop/Station finden Anmelden / Registrieren Support Hilfe für Empfänger Hilfe für Privatversender Hilfe für Geschäftskunden FAQ X Meine Pakete Paket versenden Paketshop/Station finden Anmelden / Registrieren Anmelden Versenden Paketversand Express Internationaler Versand E-Commerce Brief Fulfillment Branchenlösungen Out of Home Versand Empfangen Paketverfolgung Paketshop/Station finden DPD App Abstell-Okay Retournieren Paketshop/Station finden Retouren-Management myDPD Meine Pakete Paket versenden Paketshop/Station finden Anmelden / Registrieren Support Hilfe für Empfänger Hilfe für Privatversender Hilfe für Geschäftskunden FAQ Unternehmen DPD News Presse Innovationen Soziale Verantwortung Messen und Events Zertifikate von DPD Nachhaltigkeit Karriere bei DPD Jobs Bewerbungstipps Karriere FAQ Pickup Paketshops Paketshop/Station finden Paket
+
+=== dpd it site
+URL https://www.dpd.com/it/it/ricevere-pacchi/traccia-il-tuo-pacco/
+FINAL https://www.brt.it/
+HTTP 200 text/html; charset=UTF-8 204633B
+ Spedizioni Internazionali e Servizi di Logistica - BRT Privati Ricevere Spedire Aziende Domestico Internazionale E-commerce BRT fresh Logistica Network Filiali BRT-fermopoint Locker myBRT myBRT - business myBRT - consumer myBRT - logistica Sostenibilità Servizio Clienti FAQ Codici e assistenza Assistenza Cosa stai cercando? Chi Siamo Vision e valori Modello 231 News Area stampa Lavora con noi myBRT myBRT - business myBRT - consumer myBRT - logistica Istruzioni per spedire Come spedire online Informazioni e Istruzioni generali Brexit Supplemento Carburante Spedizioni su gomma Spedizioni per via aerea English Italian Privati Ricevere Spedire Aziende Domestico Internazionale BRT fresh E-commerce Logistica Network Filiali BRT-fermopoint Locker myBRT myBRT - business myBRT - consumer myBRT - logistica Sostenibilità Servizio Clienti FAQ Codici Assistenza Chi Siamo Vision e valori Modello 231 News Area stampa Lavora con noi Istruzioni per spedire Brexit Informazioni e Istruzioni generali Supplemento Carburante Spedizioni per via aerea Spedizioni su gomma English Italian ⚠️ Maltempo: sospensione temporanea dei collegamenti marittimi Livorno–Olbia&nbsp;&nbsp; Approfondisci&nbsp;&nbsp;&nbsp
+
+=== dpd group api
+URL https://www.dpdgroup.com/it/mydpd/my-parcels/incoming?parcelNumber=05212345678901
+FINAL https://www.dpdgroup.com/it/mydpd/my-parcels/incoming?parcelNumber=05212345678901
+HTTP 403 text/html; charset=UTF-8 5963B
+ Just a moment... Enable JavaScript and cookies to continue 
+
+=== brt chisono dpd
+URL https://vas.brt.it/vas/sped_det_show.hsm?referer=sped_numspe_par.htm&ChiSono=05212345678901
+FINAL https://vas.brt.it/vas/sped_det_show.hsm?referer=sped_numspe_par.htm&ChiSono=05212345678901
+HTTP 200 text/html 15753B
+ --> Errore BRT S.p.A. Home Benvenuto nell'area servizi on-line FAQ Rintraccia Ritiri Spedizione Servizi Tempi di consegna Italia Tempi di consegna DPD Europa Prenotazione ritiro Italiano English Fran&ccedil;ais Deutsch Errori riscontrati Ritorno Spedizione non trovata oppure ancora in elaborazione nei nostri sistemi. Correggere il parametro immesso oppure attendere e ripetere successivamente la ricerca Area informativa Servizi BRT Servizi on-line Istruzioni per spedire Fuel surcharge Servizio clienti FAQ Area clienti Contatto commerciale Login In evidenza Ultime news Archivio news Archivio Newsletter Territorio Ricerca una filiale Istituzionale Profilo aziendale Video istituzionale L'azienda in cifre Qualit&agrave;, sicurezza, ambiente L'organizzazione Lavora in BRT Legale Note legali Privacy Condizioni e termini d'uso Condizioni di trasporto --> &nbsp;&nbsp;IT Web Master --> BRT S.p.A. Tutti i diritti riservati - Codice fiscale 04507990150 - Registro Imprese Milano n. 04507990150 - Partita IVA IT04507990150 
